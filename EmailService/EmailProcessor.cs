@@ -160,6 +160,11 @@ namespace EmailService
                 string AccessKey = ReadyNote.AwsAccessKeyId;//ConfigurationManager.AppSettings["AwsAccessKeyId"];
                 string SecretKey = ReadyNote.AwsSecretKey;// ConfigurationManager.AppSettings["AwsSecretKey"];
 
+                //< add key = "AwsAccessKeyId" value = "AKIAJRXYDBWJ3JZLJ2LA" />
+                //< add key = "AwsSecretKey" value = "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" /> 
+                //< add key = "AwsAccessKeyId" value = "AKIAQHAJBQM7H3XOI4MT" />
+                //< add key = "AwsSecretKey" value = "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" />
+
                 AWSCredentials credentials = new BasicAWSCredentials(AccessKey, SecretKey);
                 _EventId = 9;
                 Events += "," + _EventId;

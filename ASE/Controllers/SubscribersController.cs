@@ -64,6 +64,9 @@ namespace ASE.Controllers
                 }
 
                 // SEND EMAILS
+                // < add key = "AwsSecretKey" value = "9+4gErZZapBLxJYuf5hfcR1/ulApCCiLBpkmMSnX" />
+                // < add key = "AwsAccessKeyId" value = "AKIARHQBNLSCPEL2OKKF" />
+
                 var AwsSecretKey = ConfigurationManager.AppSettings["AwsSecretKey"];
                 var AwsAccessKeyId = ConfigurationManager.AppSettings["AwsAccessKeyId"];
                 var AwsFromEmail = ConfigurationManager.AppSettings["AwsFromEmail"];
