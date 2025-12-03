@@ -1,0 +1,310 @@
+﻿@using Org.Business.Objects
+@using System.Security.Claims
+@model List<Product>
+@{
+    ViewBag.Title = "Subscriber Products";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="normalheader transition animated fadeIn">
+    <div class="hpanel">
+        <div class="panel-body">
+            <a class="small-header-action" href="">
+                <div class="clip-header">
+                    <i class="fa fa-arrow-up"></i>
+                </div>
+            </a>
+
+            <div id="hbreadcrumb" class="pull-right m-t-lg">
+                <ol class="hbreadcrumb breadcrumb">
+                    <li class="active">
+                        <span>@(ViewBag.Title)</span>
+                    </li>
+                </ol>
+            </div>
+            <h2 class="font-light m-b-xs">@(ViewBag.Title)</h2>
+            <small>Following is the List of @(ViewBag.Title)</small>
+        </div>
+        <div class="panel-body no-padding no-margins">
+
+        </div>
+
+    </div>
+</div>
+
+<div class="content animate-panel">
+    <div class="hpanel">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group pull-right">
+                        <a href="@Url.Action("SendEmailManually", "SubscriberProduct")" class="btn btn-primary"><i class="fa fa-envelope"></i> Send Email Manually</a>
+                        <a id="emailautobutton" class="btn btn-primary emailautobutton"><i class="fa fa-mail-bulk"></i> Send Email Auto </a>
+                        <a href="@Url.Action("SAddEdit","SubscriberProduct")" class="btn btn-success"><i class="fa fa-plus"></i> Add New Product</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hpanel">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="table-responsive">
+                            <table id="ProductsList" class="table table-striped table-bordered table-hover customdatatable" data-page-size="@(Model.Count)">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Database</th>
+                                        <th>Created Date</th>
+                                        <th>IsSendEmail</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Count > 0)
+                                    {
+                                        foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td>@item.ProductName</td>
+                                                <td>@item.DataBaseName</td>
+                                                <td>@item.RecCreatedDt.Value.ToString(CommonStatus.DateTimeFormat.SimpleDateFormat)</td>
+                                                <td>@(item.IsSendEmail ? "Yes" : "No")</td>
+                                                <td>
+                                                    <a href="@(Url.Action("SAddEdit", "SubscriberProduct",new { @ProductId =item.Id}))" class="btn btn-info btn-xs"><i class="fa fa-edit"></i> Edit</a>
+                                                    <a href="#" data-ProductId="@item.Id" data-Query="@item.ContentQuery" class="btn btn-primary btn-xs btnAddEditQuery"><i class="fa fa-code"></i> Add/Edit Query</a>
+                                                    <a href="#" data-ProductId="@item.Id" class="btn btn-danger btn-xs btnRemoveProduct"><i class="fa fa-trash"></i> Remove</a>
+                                                    <a class="btn btn-primary btn-xs emailautobutton" data-id="@(item.Id)"><i class="fa fa-mail-bulk"></i> Send Email </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="queryModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add/Edit Query</h4>
+                <small class="text-muted mt-2">
+                    Enter your queries below. Please follow these guidelines:
+                </small>
+                <ul class="text-muted">
+                    <li><small>When writing queries, refrain from using double or single quotes around the queries themselves.</small></li>
+                    <li><small>If you're including multiple queries, ensure you separate them with a tilde (~) character. Otherwise treated as single Query that cause problem.</small></li>
+                </ul>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="queryProductId">
+                <textarea id="queryTextarea" class="form-control" rows="10"></textarea>  
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="saveQueryButton" type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    @Styles.Render("~/bundles/select2/css")
+    @Styles.Render("~/bundles/datepicker/css")
+    @Styles.Render("~/bundles/datatables/css")
+    @*@Styles.Render("~/bundles/datatablesResponsive/css")*@
+    @Styles.Render("~/bundles/bootstrapCheckbox/css")
+    @Styles.Render("~/bundles/sweetAlert/css")
+
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/moment/js")
+    @Scripts.Render("~/bundles/select2/js")
+    @Scripts.Render("~/bundles/datepicker/js")
+    @Scripts.Render("~/bundles/datatables/js")
+    @Scripts.Render("~/bundles/datatablesBootstrap/js")
+    @*@Scripts.Render("~/bundles/datatablesResponsive/js")*@
+    @Scripts.Render("~/bundles/sweetAlert/js")
+
+    @Scripts.Render("~/bundles/validation/js")
+
+<script>
+        $(document).ready(function () {
+            $('#ProductsList').DataTable({
+                //"paging": true,
+                //"info": false,
+                "paging": true,
+                //"searching": true,
+                "order": [[2, "desc"]],
+                "language": {
+                    "emptyTable": "No Product has been added yet."
+                },
+                "searching": false
+            });
+        })
+
+        $(".btnRemoveProduct").click(function () {
+            var ProductId = $(this).attr("data-ProductId");
+            var table = $('#ProductsList').DataTable();
+            var chk=$(this);
+            swal({
+                title: "Remove Product",
+                text: "Are you sure to remove Product?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: '#D24637',
+                confirmButtonText: 'Yes, I am sure!',
+                cancelButtonText: "No, cancel it!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: '@Url.Action("RemoveSubsProduct", "SubscriberProduct")',
+                        data: {
+                            "ProductId": ProductId
+                        },
+                        type: "POST",
+                        dataType: "json",
+                        success: function (data) {
+                            table.row($(chk).closest('tr')).remove().draw(false);
+                            swal({
+                                title: "Success",
+                                text: "Product has been removed successfully.",
+                                type: "success"
+                            });
+                        },
+                        error: function (data) {
+                            swal({
+                                title: "Error!",
+                                text: "Unable to Remove Product. Please try again later.",
+                                type: "error"
+                            });
+                            HideStickyPopup();
+                        }
+                    })
+                }
+            });
+
+        })
+
+        $(".btnAddEditQuery").click(function () {
+         var productId = $(this).data("productid");
+
+         // Fetch the updated query using AJAX
+        $.ajax({
+        url: '@Url.Action("GetInlineQuery", "SubscriberProduct")',
+        data: { "ProductId": productId },
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+            var query = data.InlineQuery;
+
+            // Set the product ID and updated query content in the modal
+            $("#queryProductId").val(productId);
+            $("#queryTextarea").val(query);
+
+            // Open the modal
+            $("#queryModal").modal("show");
+        },
+        error: function () {
+            // Handle error if needed
+        }
+                });
+        });
+
+
+        $("#saveQueryButton").click(function () {
+            var productId = $("#queryProductId").val();
+            var inlineQuery = $("#queryTextarea").val();
+
+            // Make an AJAX request to update the query
+            $.ajax({
+                url: '@Url.Action("UpdateInlineQuery", "SubscriberProduct")',
+                data: {
+                    "ProductId": productId,
+                    "InlineQuery": inlineQuery
+                },
+                type: "POST",
+                dataType: "json",
+                success: function (data) {
+
+
+                    swal({
+                        title: "Success",
+                        text: "Queries for this product has been updated successfully.",
+                        type: "success"
+                    });
+                    $("#queryModal").modal("hide");
+                    // Handle the success response if needed
+                },
+                error: function (data) {
+                    // Handle the error response if needed
+                }
+            });
+        });
+
+        //$("#emailautobutton").click(function () {
+
+            $(document).on("click", ".emailautobutton", function () {
+
+                var prodId = $(this).attr("data-id");
+
+            var chk=$(this);
+            swal({
+                title: "Email Confirmation",
+                text: "Are you sure to send email automatically?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: '#D24637',
+                confirmButtonText: 'Yes, I am sure!',
+                cancelButtonText: "No, cancel it!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: '@Url.Action("SendEmailsAuto", "SubscriberProduct")',
+                        type: "GET",
+                        dataType: "json",
+                        data: {
+                            "productId": prodId
+                        },
+                        success: function (data) {
+                            table.row($(chk).closest('tr')).remove().draw(false);
+                            swal({
+                                title: "Success",
+                                text: "Emails send successfully.",
+                                type: "success"
+                            });
+                        },
+                        error: function (data) {
+                            swal({
+                                title: "Error!",
+                                text: "Unable to Send Emails. Please try again later.",
+                                type: "error"
+                            });
+                            HideStickyPopup();
+                        }
+                    })
+                }
+            });
+
+        })
+
+</script>
+}
+

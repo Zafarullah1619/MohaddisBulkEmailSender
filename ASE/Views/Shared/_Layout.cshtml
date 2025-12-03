@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - ECB</title>
+    
+    <!-- Primary vendor style -->
+    @Styles.Render("~/bundles/font-awesome/css")
+    @Styles.Render("~/bundles/animate/css")
+    @Styles.Render("~/bundles/bootstrap/css")
+    @Styles.Render("~/bundles/peicon7stroke/css")
+
+    <!-- Add local styles, mostly for plugins css file -->
+    @if (IsSectionDefined("Styles"))
+    {@RenderSection("Styles", required: false)}
+
+    <!-- Primary HOMER style -->
+    @Styles.Render("~/bundles/homer/css")
+
+</head>
+<body class="hide-sidebar">
+
+    <!-- Header -->
+    <div id="header">
+        @Html.Partial("_Header")
+    </div>
+
+    <div id="wrapper">
+        <div class="fixed-width">
+            @RenderBody()
+        </div>
+    </div>
+    @Html.Partial("_Footer")
+    <div id="sticky_popup" class="popup">
+        <div style="text-align:center;">
+            <img src="~/Images/loading.svg" width="64" height="64" />
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery/js")
+    @Scripts.Render("~/bundles/bootstrap/js")
+    @Scripts.Render("~/bundles/homer/js")
+    @Scripts.Render("~/bundles/popup/js")
+    @RenderSection("scripts", required: false)
+
+    <script>
+
+        $(document).ready(function () {
+            $("#sticky_popup").popup({
+                opacity: 0.45,
+                scrolllock: true,
+                autozindex: true,
+                escape: false,
+                blur: false
+            });
+        })
+
+        function ShowStickyPopup() {
+            $("#sticky_popup").popup("show");
+        }
+        function HideStickyPopup() {
+            $("#sticky_popup").popup("hide");
+            console.log($("#sticky_popup").length)
+        }
+
+        function ShowAllErrorMessage(msg) {
+            swal({
+                title: "Error!",
+                text: msg,
+                type: "error"
+            });
+        }
+        function ShowSuccessMessage(msg) {
+            swal({
+                title: "Success!",
+                text: msg,
+                type: "success"
+            });
+        }
+
+    </script>
+
+</body>
+</html>

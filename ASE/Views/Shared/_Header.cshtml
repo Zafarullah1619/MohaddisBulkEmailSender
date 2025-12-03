@@ -1,0 +1,61 @@
+﻿@using System.Security.Claims;
+@using Microsoft.AspNet.Identity;
+@{
+    var UserIdentity = (ClaimsIdentity)Context.User.Identity;
+}
+@*<div class="color-line"></div>*@
+<div id="logo" class="light-version">
+    <span>
+        <a href="@Url.Action("Index","Product")">
+            <img src="~/Images/logo.png" class="logo" />
+        </a>
+    </span>
+</div>
+<nav role="navigation">
+
+    <div class="small-logo">
+        <a href="@Url.Action("Index","Product")">
+            <span class="text-primary"><img src="~/Images/logo.png" style="height:45px;" /></span>
+
+        </a>
+    </div>
+    <nav class="">
+        <div class="navbar-header">
+            <button aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse" class="navbar-toggle collapsed" type="button">
+                <span class="sr-only">Toggle navigation</span>
+                <i class="fa fa-navicon"></i>
+            </button>
+
+        </div>
+        <div id="navbar" class="landing-page navbar-left">
+            <ul class="nav navbar-nav navbar-left">
+                @*<li><a href="@Url.Action("Index","Product")">Products</a></li>*@
+            </ul>
+        </div>
+    </nav>
+    <div class="navbar-right">
+        @if (Request.IsAuthenticated)
+        {
+            <ul class="nav navbar-nav no-borders">
+                <li class="dropdown">
+                    <a href="#" style="padding-top:5px" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="~/Images/profile.png" id="imgHeaderProfile" class="img-circle m-b-n" width="45" height="45" alt="Profile Picture">
+                    </a>
+
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        
+                        <li>
+                            @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <a href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+                            }
+                        </li>
+                    </ul>
+
+
+                </li>
+            </ul>
+        }
+    </div>
+</nav>

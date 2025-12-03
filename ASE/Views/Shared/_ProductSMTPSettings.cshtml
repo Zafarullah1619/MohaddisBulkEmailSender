@@ -1,0 +1,164 @@
+﻿@using Org.Business.Objects
+@model SmtpConfiguration
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="form-group">
+
+            <div style="display: inline-block;">
+                <input type="radio" id="IsSMTP" name="rdoAWS" value="false"
+                       checked>
+                <label for="IsSMTP">Send Using Custom SMTP</label>
+            </div>
+
+            <div style="display: inline-block;">
+                <input type="radio" id="IsAWS" name="rdoAWS" value="true" @(Model!=null && Model.Id>0 && Convert.ToBoolean(Model.IsAWSBulkEmail)? "checked" : "") >
+                <label for="IsAWS">Send Using Amazon AWS</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row useSMTP @(Model!=null && Model.Id>0 && Convert.ToBoolean(Model.IsAWSBulkEmail)?"hidden":"")">
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="Title">SMTP Title: <span class="required-mark">*</span></label>
+            <input type="text" class="form-control" placeholder="Title" name="Title" id="Title" value="@(Model!=null && Model.Id>0?Model.Title:"")" />
+        </div>
+    </div>
+    <div class="col-lg-3 hidden">
+        <a href="#" class="btn btn-success m-t-md" id="btnSendTestEmail"><i class="fa fa-send-o"></i> Send Test Email</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="FromName">From Name: <span class="required-mark">*</span></label>
+            <input type="text" class="form-control" placeholder="From Name" name="FromName" id="FromName" value="@(Model!=null && Model.Id>0?Model.FromName:"")" />
+        </div>
+    </div>
+    <div class="col-lg-6">
+
+        <div class="form-group">
+            <label for="FromEmail">From Email: <span class="required-mark">*</span></label>
+            <input type="email" class="form-control" placeholder="From Email" name="FromEmail" id="FromEmail" value="@(Model!=null && Model.Id>0?Model.FromEmail:"")" />
+        </div>
+    </div>
+</div>
+<div class="row useSMTP @(Model!=null && Model.Id>0 && Convert.ToBoolean(Model.IsAWSBulkEmail)?"hidden":"")">
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="SmtpServer">SMTP Server/Hostname/IP Address: <span class="required-mark">*</span></label>
+            <input type="text" class="form-control" placeholder="SMTP Server" name="SmtpServer" id="SmtpServer" value="@(Model!=null && Model.Id>0?Model.SmtpServer:"")" />
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="">
+            <div class="">
+                <div class="form-group">
+                    <label for="SmtpPort">Port: <span class="required-mark">*</span>(Default:25,SSL:465)</label>
+                    <input type="text" class="form-control" placeholder="SMTP Port" name="SmtpPort" id="SmtpPort" value="@(Model!=null && Model.Id>0?Model.SmtpPort:25)" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label class="control-label">Enable SSL:</label><br />
+            <div data-toggle="buttons" class="btn-group radio-button-group">
+                <label class="btn btn-default @(Model!=null && Model.Id>0 && Convert.ToBoolean(Model.EnableSSL)?"active":"")">
+                    <input type="radio" id="EnableSSLTrue" name="EnableSSL" @(Model != null && Model.Id > 0 && Convert.ToBoolean(Model.EnableSSL) ? "checked=\"checked\"" : "") value="@(Model!=null && Model.Id>0 && Convert.ToBoolean(Model.EnableSSL)?"true":"false")"> Yes
+                </label>
+                <label class="btn btn-default @(Model!=null && Model.Id>0 && !Convert.ToBoolean(Model.EnableSSL)?"active":"")">
+                    <input type="radio" id="EnableSSLFalse" name="EnableSSL" @(Model != null && Model.Id > 0 && !Convert.ToBoolean(Model.EnableSSL) ? "checked=\"checked\"" : "")> No
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row useSMTP @(Model!=null && Model.Id>0 && Convert.ToBoolean(Model.IsAWSBulkEmail)?"hidden":"")">
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="SmtpUser">UserName/Email: <span class="required-mark">*</span></label>
+            <input type="text" class="form-control" placeholder="SMTP User" name="SmtpUser" id="SmtpUser" value="@(Model!=null && Model.Id>0?Model.SmtpUser:"")" />
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="SmtpPassword">Password: <span class="required-mark">*</span></label>
+            <input type="password" class="form-control" placeholder="SMTP Password" name="SmtpPassword" id="SmtpPassword" value="@(Model!=null && Model.Id>0?Model.SmtpPassword:"")" />
+        </div>
+    </div>
+</div>
+
+<div class="row useAWS @(Model!=null && Model.Id>0 && Convert.ToBoolean(Model.IsAWSBulkEmail)?"":"hidden")">
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="AwsServiceURL">Aws Service URL: <span class="required-mark">*</span></label>
+            <input type="text" class="form-control" placeholder="Aws Service URL" name="AwsServiceURL" id="AwsServiceURL" value="@(Model!=null && Model.Id>0?Model.AwsServiceURL:"")" />
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="AwsBulkEmailCount">Aws Bulk Email Count: <span class="required-mark">*</span></label>
+            <input type="number" class="form-control" placeholder="Aws Bulk Email Count" name="AwsBulkEmailCount" id="AwsBulkEmailCount" value="@(Model!=null && Model.Id>0?Model.AwsBulkEmailCount:0)" />
+        </div>
+    </div>
+</div>
+
+<div class="row useAWS @(Model!=null && Model.Id>0 && Convert.ToBoolean(Model.IsAWSBulkEmail)?"":"hidden")">
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="AwsSecretKey">Aws Secret Key: <span class="required-mark">*</span></label>
+            <input type="text" class="form-control" placeholder="Aws Secret Key" name="AwsSecretKey" id="AwsSecretKey" value="@(Model!=null && Model.Id>0?Model.AwsSecretKey:"")" />
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="form-group">
+            <label for="AwsAccessKeyId">Aws Access Key Id: <span class="required-mark">*</span></label>
+            <input type="text" class="form-control" placeholder="Aws Access Key Id" name="AwsAccessKeyId" id="AwsAccessKeyId" value="@(Model!=null && Model.Id>0?Model.AwsAccessKeyId:"")" />
+        </div>
+    </div>
+</div>
+
+<div class="form-group hidden">
+    <label for="SmtpDomain">SMTP Domain: <span class="required-mark">*</span></label>
+    <input type="text" class="form-control" placeholder="SMTP Domain" name="SmtpDomain" id="SmtpDomain" />
+</div>
+<div class="form-group hidden">
+    <label for="SmtpFooter">SMTP Footer:</label>
+    <input type="text" class="form-control" placeholder="Smtp Footer" name="SmtpFooter" id="SmtpFooter" />
+</div>
+<div class="form-group hidden">
+    <input type="checkbox" name="chkDefault" id="chkDefault" class=""> <label for="chkDefault">Mark this as Default SMTP?</label>
+</div>
+
+<div class="col-lg-12 text-right">
+    <a class="btn btn-default" href="@(Url.Action("Index","Product"))"><i class="fa fa-close"></i> Cancel</a>
+    <a class="btn btn-primary" id="btnAddSMTPConfig"><i class="fa fa-save"></i> Save</a>
+</div>
+
+<input type="hidden" name="IsDefault" id="IsDefault" value="@(Model!=null && Model.Id>0?Model.IsDefault:false)" />
+<input type="hidden" name="Id" id="Id" value="@(Model!=null && Model.Id>0?Model.Id:0)" />
+<input type="hidden" id="PostMarkSignatureId" name="PostMarkSignatureId" />
+<input type="hidden" id="IsAWSBulkEmail" name="IsAWSBulkEmail" value="@(Model!=null && Model.Id>0 && Convert.ToBoolean(Model.IsAWSBulkEmail)? "true" : "false")" />
+
+<script>
+    $(document).ready(function () {
+        $('input[type=radio][name=rdoAWS]').change(function () {
+
+            if (this.value == 'false') {
+                $("#IsAWSBulkEmail").val('false');
+                $(".useSMTP").removeClass("hidden");
+                $(".useAWS").addClass("hidden");
+            }
+            else if (this.value == 'true') {
+                $("#IsAWSBulkEmail").val('true');
+                $(".useSMTP").addClass("hidden");
+                $(".useAWS").removeClass("hidden");
+            }
+        });
+    })
+</script>

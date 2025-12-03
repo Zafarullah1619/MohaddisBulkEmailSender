@@ -1,0 +1,14 @@
+﻿
+cd C:\Windows\Microsoft.NET\Framework\v4.0.30319\
+
+----===Instal
+installutil.exe "G:\EmailCampaignBuilderService\Debug\EmailService.exe"
+
+----===Uninstal
+installutil.exe -u "G:\EmailCampaignBuilderService\Debug\EmailService.exe"
+
+----====Delete
+SC DELETE EmailCampaignBuilder
+
+----====Start
+SC START EmailCampaignBuilder

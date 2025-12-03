@@ -1,0 +1,590 @@
+﻿@using Org.Business.Objects
+@using System.Security.Claims
+@model ProductViewModal
+@{
+    ViewBag.Title = "Add Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="normalheader transition animated fadeIn">
+    <div class="hpanel">
+        <div class="panel-body">
+            <a class="small-header-action" href="">
+                <div class="clip-header">
+                    <i class="fa fa-arrow-up"></i>
+                </div>
+            </a>
+
+            <div id="hbreadcrumb" class="pull-right m-t-lg">
+                <ol class="hbreadcrumb breadcrumb">
+
+                    <li>
+                        <a href="@Url.Action("Index", "SubscriberProduct")">Products</a>
+                    </li>
+                    <li class="active">
+                        <span>@(ViewBag.Title) Product</span>
+                    </li>
+                </ol>
+            </div>
+            <h2 class="font-light m-b-xs">
+                @(ViewBag.Title)
+            </h2>
+            <small>@(ViewBag.Title) Information against this Product.</small>
+        </div>
+    </div>
+</div>
+
+
+<div class="content animate-panel">
+    <div class="row">
+
+        <div class="col-lg-12">
+            <div class="hpanel">
+
+                @{
+                    string Hidden = "hidden";
+                    if (Model.Product != null && Model.Product.Id > 0)
+                    {
+                        Hidden = "";
+                    }
+                }
+
+                <ul class="nav nav-tabs" id="myTab">
+                    <li class="active"><a data-toggle="tab" href="#info">General</a></li>
+                    <li class="Tabs @(Hidden)"><a data-toggle="tab" href="#email">Email Settings</a></li>
+                </ul>
+
+                <div class="tab-content">
+
+                    <div id="info" class="tab-pane active">
+                        <div class="panel-body">
+                            @using (Html.BeginForm("UpdateSubscriberProductInfo", "SubscriberProduct", FormMethod.Post, new { role = "form", @id = "BasicInfoForm" }))
+                            {
+                                <div class="row">
+
+                                    <div class="col-lg-12">
+                                        <div class="hpanel  hgreen">
+                                            <div class="panel-heading">
+                                                General Information
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="form-group">
+
+                                                    <div class="row">
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="ProductName">Product Name: <span class="required-mark">*</span></label>
+                                                                <input type="text" class="form-control" id="ProductName" name="ProductName" value="@(Model.Product !=null && Model.Product.Id > 0 ? Model.Product.ProductName : "")" />
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="DataBaseName">Database Name: <span class="required-mark">*</span></label>
+                                                                <input type="text" class="form-control" id="DataBaseName" name="DataBaseName" value="@(Model.Product !=null && Model.Product.Id > 0 ? Model.Product.DataBaseName : "")" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="DBServer">DB Server: <span class="required-mark">*</span></label>
+                                                                <input type="text" class="form-control" id="DBServer" name="DBServer" value="@(Model.Product !=null && Model.Product.Id > 0 ? Model.Product.DBServer : "")" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="DBUserName">DB Username: <span class="required-mark">*</span></label>
+                                                                <input type="text" class="form-control" id="DBUserName" name="DBUserName" value="@(Model.Product !=null && Model.Product.Id > 0 ? Model.Product.DBUserName : "")" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="DBPassword">DB Password:</label>
+                                                                <input type="text" class="form-control" id="DBPassword" name="DBPassword" value="@(Model.Product !=null && Model.Product.Id > 0 ? Model.Product.DBPassword : "")" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-2">
+                                                            <div class="form-group">
+                                                                <label for="DBServerType">DB Server Type: <span class="required-mark">*</span></label>
+                                                                <select id="DBServerType" name="DBServerType" class="form-control">
+                                                                    <option value="">Select Type</option>
+                                                                    <option value="MSSQL" @(Model.Product != null && Model.Product.Id > 0 && Model.Product.DBServerType == "MSSQL" ? "selected=\"selected\"" : "")>MS SQL</option>
+                                                                    <option value="MySQL" @(Model.Product != null && Model.Product.Id > 0 && Model.Product.DBServerType == "MySQL" ? "selected=\"selected\"" : "")>My SQL</option>
+                                                                    <option value="SQLLite" @(Model.Product != null && Model.Product.Id > 0 && Model.Product.DBServerType == "SQLLite" ? "selected=\"selected\"" : "")>SQL Lite</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="form-group">
+                                                                <label class="control-label">Is Send Email:</label><br />
+                                                                <div data-toggle="buttons" class="btn-group radio-button-group">
+                                                                    <label class="btn btn-default @(Convert.ToBoolean(Model.Product.IsSendEmail)?"active":"")">
+                                                                        <input type="radio" id="IsSendEmailTrue" name="IsSendEmail" @(Convert.ToBoolean(Model.Product.IsSendEmail) ? "checked=\"checked\"" : "") value="@(Convert.ToBoolean(Model.Product.IsSendEmail)?"true":"false")"> Yes
+                                                                    </label>
+                                                                    <label class="btn btn-default @(!Convert.ToBoolean(Model.Product.IsSendEmail)?"active":"")">
+                                                                        <input type="radio" id="IsSendEmailFalse" name="IsSendEmail" @(!Convert.ToBoolean(Model.Product.IsSendEmail) ? "checked=\"checked\"" : "")> No
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        @if (Model.Product != null && Model.Product.Id > 0)
+                                                        {
+                                                            <div class="col-lg-8">
+                                                                <div class="form-group">
+                                                                    <label for="Subject">Email Subject:</label>
+
+                                                                    <input type="text" class="form-control" id="Subject" name="Subject" value="@Model.emailSettings.Subject" />
+
+                                                                </div>
+                                                            </div>
+
+                                                        }
+                                                        @if (Model.Product != null && Model.Product.Id > 0)
+                                                        {
+                                                            <div class="col-lg-4">
+                                                                <div class="form-group">
+                                                                    <label for="SelectedPlaceholders">Select Placeholders:</label>
+                                                                    <select id="SelectedPlaceholders" name="SelectedPlaceholders" class="form-control">
+                                                                        @if (Model.PlaceHolders != null && Model.PlaceHolders.Count > 0)
+                                                                        {
+                                                                            foreach (var column in Model.PlaceHolders)
+                                                                            {
+                                                                                var isSelected = Model.SelectPlaceholders != null && Model.SelectPlaceholders.Contains(column);
+                                                                                <option value="@column" data-placeholder="[[@(column)]]" @(isSelected ? "selected" : "")>@column</option>
+
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <option value="" disabled>No placeholders available for this Product. Please go and enter the Query for this Product.</option>
+                                                                        }
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        @if (Model.Product != null && Model.Product.Id > 0)
+                                                        {
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group">
+                                                                    <label for="EmailBody">Email Body:</label>
+
+                                                                    <textarea id="EmailBody" name="EmailBody" class="form-control EmailBodyText">@Html.Raw(Model.emailSettings.Body)</textarea>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-12 text-right">
+                                                            <a class="btn btn-default" href="@(Url.Action("Index","SubscriberProduct"))"><i class="fa fa-close"></i> Cancel</a>
+                                                            <a href="#" class="btn btn-primary" id="btnAddProductInfo"><i class="fa fa-save"></i> Save</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div id="email" class="tab-pane">
+                        <div class="panel-body">
+                            @using (Html.BeginForm("SMTPConfigurations", "Product", FormMethod.Post, new { role = "form", @id = "SMTPConfigForm" }))
+                            {
+
+                                <div class="hpanel  hgreen">
+                                    <div class="panel-heading">
+                                        Email Settings
+                                    </div>
+                                    <div class="panel-body" id="SMTPSettings">
+
+                                    </div>
+
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="ProductId" name="ProductId" value="@(Model!=null && Model.Product != null && Model.Product.Id > 0?Model.Product.Id:0)" />
+
+@section Styles {
+    @Styles.Render("~/bundles/select2/css")
+    @Styles.Render("~/bundles/datepicker/css")
+    @Styles.Render("~/bundles/bootstrapCheckbox/css")
+    @Styles.Render("~/bundles/sweetAlert/css")
+
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/moment/js")
+    @Scripts.Render("~/bundles/select2/js")
+    @Scripts.Render("~/bundles/datepicker/js")
+    @Scripts.Render("~/bundles/sweetAlert/js")
+
+    @Scripts.Render("~/bundles/validation/js")
+    @*<script src="~/Scripts/tinymce.min.js"></script>*@
+    @*<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>*@
+    <script src="~/Scripts/tinymce.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            var ProductId = $("#ProductId").val();
+
+            InitializeTinyMCE();
+
+            SMTPSettings();
+
+            $('#SelectedPlaceholders').select2({
+                placeholder: 'Select Place Holders',
+                allowClear: true, // This allows users to clear the selection
+                width: '100%' // Set the width of the dropdown to 100% of its parent container
+            });
+
+        })
+
+        $("#btnAddProductInfo").click(function () {
+            if (!$("#BasicInfoForm").valid()) {
+                return false;
+            }
+
+            var ProductName = $("#ProductName").val();
+            var DataBaseName = $("#DataBaseName").val();
+            var DBServer = $("#DBServer").val();
+            var DBUserName = $("#DBUserName").val();
+            var DBPassword = $("#DBPassword").val();
+            var DBServerType = $("#DBServerType").val();
+            var Subject = $("#Subject").val();
+            var SelectedPlaceholders = $("#SelectedPlaceholders").val();
+            var tinymceEditor = tinymce.get("EmailBody");
+            var Body = '';
+
+            if (tinymceEditor) {
+                Body = encodeURIComponent(tinymceEditor.getContent({ format: 'raw' }));
+            }
+            var IsSendEmail = false;
+            var isChecked = $('#IsSendEmailTrue').prop('checked');
+            if (isChecked) {
+                IsSendEmail = true;
+            }
+
+            $.ajax({
+                url: '@Url.Action("UpdateSubscriberProductInfo", "SubscriberProduct")',
+                data: {
+                    "ProductId": $("#ProductId").val(),
+                    "ProductName": ProductName,
+                    "DBServer": DBServer,
+                    "DBUserName": DBUserName,
+                    "DBPassword": DBPassword,
+                    "DataBaseName": DataBaseName,
+                    "DBServerType": DBServerType,
+                    "IsSendEmail": IsSendEmail,
+                    "Subject": Subject,
+                    "SelectedPlaceholders": SelectedPlaceholders,
+                    "Body": Body
+                },
+                type: "POST",
+                dataType: "json",
+                success: function (data) {
+                    window.location.hash = 'info';
+                    window.location.reload();
+                },
+                error: function (data) {
+                    // Handle error here
+                }
+            });
+        })
+
+        $("#BasicInfoForm").validate({
+            rules: {
+
+                ProductName: {
+                    required: true
+                },
+                DataBaseName: {
+                    required: true
+                },
+                DBServer: {
+                    required: true
+                },
+                DBUserName: {
+                    required: true
+                },
+                DBPassword: {
+                    required: true
+                },
+                DBServerType: {
+                    required: true
+                }
+            },
+            messages: {
+                ProductName: {
+                    required: "(Please Enter Product Name)",
+                },
+                DataBaseName: {
+                    required: "(Please Enter Data Base Name)",
+                },
+                DBServer: {
+                    required: "(Please Enter DB Server)",
+                },
+                DBUserName: {
+                    required: "(Please Enter DB User Name)",
+                },
+                DBPassword: {
+                    required: "(Please Enter DB Password)",
+                },
+                DBServerType: {
+                    required: "(Please Select DB Server Type)",
+                }
+            },
+            submitHandler: function (form) {
+                form.submit();
+            },
+            errorPlacement: function (error, element) {
+                $(element)
+                    .closest("form")
+                    .find("label[for='" + element.attr("id") + "']")
+                    .append(error);
+            },
+            errorElement: "span",
+        });
+
+         $(document).on("click", "#btnAddSMTPConfig", function () {
+            if (!$("#SMTPConfigForm").valid()) {
+                return false;
+            }
+            //ShowStickyPopup();
+            var EnableSSL = false;
+            var isChecked = $('#EnableSSLTrue').prop('checked');
+            if (isChecked) {
+                EnableSSL = true;
+            }
+            $.ajax({
+                url: '@Url.Action("SMTPConfigurations", "Product")',
+                data: {
+                    "ProductId": $("#ProductId").val(),
+                    "Title": $("#Title").val(),
+                    "FromName": $("#FromName").val(),
+                    "FromEmail": $("#FromEmail").val(),
+                    "SmtpServer": $("#SmtpServer").val(),
+                    "SmtpPort": $("#SmtpPort").val(),
+                    "SmtpUser": $("#SmtpUser").val(),
+                    "SmtpPassword": $("#SmtpPassword").val(),
+                    "SmtpDomain": $("#SmtpDomain").val(),
+                    "SmtpFooter": $("#SmtpFooter").val(),
+                    "SSLPort": $("#SSLPort").val(),
+                    "PostMarkSignatureId": $("#PostMarkSignatureId").val(),
+                    "IsDefault": $("#IsDefault").val(),
+                    "EnableSSL": EnableSSL,
+                    "Id": $("#Id").val(),
+
+                    "IsAWSBulkEmail": $("#IsAWSBulkEmail").val(),
+                    "AwsServiceURL": $("#AwsServiceURL").val(),
+                    "AwsBulkEmailCount": $("#AwsBulkEmailCount").val(),
+                    "AwsAccessKeyId": $("#AwsAccessKeyId").val(),
+                    "AwsSecretKey": $("#AwsSecretKey").val(),
+                },
+                type: "POST",
+                dataType: "json",
+                success: function (data) {
+                    //SMTPSettings();
+                    window.location.reload();
+                    window.location.hash = 'email';
+
+                    //HideStickyPopup();
+                },
+                error: function (data) {
+                    //HideStickyPopup();
+                }
+            });
+            //$("#SMTPConfigForm").submit();
+         })
+
+        $("#SMTPConfigForm").validate({
+            rules: {
+
+                Title: {
+                    required: true
+                },
+                FromName: {
+                    required: true
+                },
+                FromEmail: {
+                    required: true,
+                    email: true
+                },
+                SmtpServer: {
+                    required: true
+                },
+                SmtpPort: {
+                    required: true
+                },
+                SmtpUser: {
+                    required: true
+                },
+                SmtpPassword: {
+                    required: true
+                },
+                SmtpDomain: {
+                    required: true
+                }
+                ,
+                AwsServiceURL: {
+                    required: true
+                },
+                AwsBulkEmailCount: {
+                    required: true,
+                    min: 1
+                },
+                AwsSecretKey: {
+                    required: true
+                },
+                AwsAccessKeyId: {
+                    required: true
+                }
+            },
+            messages: {
+                FromEmail: {
+                    required: "(Please Enter Email)",
+                    email: "(Please Enter Valid Email)"
+                },
+                Title: {
+                    required: "(Please Enter Title)",
+                },
+                FromName: {
+                    required: "(Please Enter From Name)",
+                },
+                SmtpServer: {
+                    required: "(Please Enter SMTP Server/Hostname/IP Address)",
+                },
+                SmtpPort: {
+                    required: "(Please Enter Smtp Port)",
+                },
+                SmtpUser: {
+                    required: "(Please Enter Smtp User)",
+                },
+                SmtpPassword: {
+                    required: "(Please Enter Smtp Password)",
+                },
+                SmtpDomain: {
+                    required: "(Please Enter Smtp Domain)",
+                }
+                ,
+                AwsServiceURL: {
+                    required: "(Please Enter Aws Service URL)",
+                },
+                AwsBulkEmailCount: {
+                    required: "(Please Enter Aws Bulk Email Count)",
+                },
+                AwsSecretKey: {
+                    required: "(Please Enter Aws Secret Key)",
+                },
+                AwsAccessKeyId: {
+                    required: "(Please Enter Aws Access Key Id)",
+                }
+
+            },
+            submitHandler: function (form) {
+                form.submit();
+            },
+            errorPlacement: function (error, element) {
+                $(element)
+                    .closest("form")
+                    .find("label[for='" + element.attr("id") + "']")
+                    .append(error);
+            },
+            errorElement: "span",
+        });
+    </script>
+
+    <script>
+        function InitializeTinyMCE() {
+            tinymce.init({
+                selector: '.EmailBodyText',
+                height: 500,
+                theme: 'modern',
+                //relative_urls: true,
+                //remove_script_host: false,
+                convert_urls: false,
+                plugins: [
+                    'advlist autolink code lists link image charmap print preview hr anchor pagebreak',
+                    'searchreplace wordcount visualblocks visualchars code fullscreen',
+                    'insertdatetime media nonbreaking save table contextmenu directionality',
+                    'emoticons template paste textcolor colorpicker textpattern imagetools code'
+                ],
+                toolbar1: 'insertfile undo redo | styleselect | fontselect | fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | code',
+                toolbar2: 'print preview media | forecolor backcolor emoticons',
+                fontsize_formats: "6pt 7pt 8pt 10pt 12pt 14pt 18pt 24pt 36pt",
+                image_advtab: true,
+                templates: [
+                    { title: 'Test template 1', content: 'Test 1' },
+                    { title: 'Test template 2', content: 'Test 2' }
+                ],
+                font_formats:
+                    "Jameel Noori Nastaleeq='Jameel Noori Nastaleeq', serif;" +
+                    "Mehr Nastaleeq Urdu='Mehr Nastaleeq', serif;" +
+                    "KFGQPC Uthman Taha Naskh Arabic='KFGQPC Uthman Taha Naskh', serif;" +
+                    "Noore Huda Arabic='noorehuda', serif;"+
+                    "Scheherazade New='Scheherazade New', serif;" +
+                    "Cairo=Cairo, sans-serif;" +
+                    "Roboto=roboto, sans-serif;" +
+                    "Poppins=poppins, sans-serif;" +
+                    "Open Sans=open sans, sans-serif;" +
+                    "Lato=lato, sans-serif;" +
+                    "Montserrat=montserrat, sans-serif;" +
+                    "Raleway=raleway, sans-serif;" +
+                    "Merriweather=merriweather, serif;" +
+                    "Playfair Display=playfair display, serif;" +
+                    "Arial=arial,helvetica,sans-serif;" +
+                    "Times New Roman=times new roman,times;" +
+                    "Verdana=verdana,geneva;",
+
+        // ✅ Load fonts into TinyMCE iframe
+        content_css: [
+            // Google Fonts (Arabic + Latin)
+            'https://fonts.googleapis.com/css2?family=Amiri&family=Cairo&family=Noto+Nastaliq+Urdu&family=Roboto&family=Poppins&family=Open+Sans&family=Lato&family=Montserrat&family=Raleway&family=Merriweather&family=Playfair+Display&display=swap',
+
+            // Your own Urdu font (Jameel) if hosted locally
+            '/content/font-face.css',  // 👈 this should have font-face for Jameel
+        ]
+            });
+        }
+
+        $('#SelectedPlaceholders').on('change', function () {
+            var selectedOption = $(this).find(':selected');
+            var placeholder = selectedOption.data('placeholder'); // <-- get data-placeholder
+
+            if (placeholder) {
+                tinymce.activeEditor.execCommand('mceInsertContent', false, placeholder);
+                $(this).val(null).trigger('change'); // reset select2
+            }
+        });
+
+        function SMTPSettings() {
+            var ProductId = $("#ProductId").val();
+            $.ajax({
+                url: '@Url.Action("ProductSMTPSettingsPartial", "Product")',
+                data: {
+                    "ProductId": ProductId
+                },
+                type: "POST",
+                dataType: "html",
+                success: function (data) {
+                    $("#SMTPSettings").append(data);
+                },
+                error: function (data) {
+                }
+            });
+        }
+    </script>
+}
+

@@ -1,0 +1,257 @@
+﻿@using Org.Business.Objects
+@using System.Security.Claims
+@using Newtonsoft.Json
+@model ProductViewModal
+
+@if (Model != null && Model.lstProductRules!=null && Model.lstProductRules.Count > 0 && !Convert.ToBoolean(Model.FromScratch))
+{
+    int i = 1;
+    foreach (var Rule in Model.lstProductRules)
+    {
+        var ruleViewModel = JsonConvert.DeserializeObject<List<RuleViewModel>>(Rule.RulesJson);
+        string cssClass = "";
+        string btnCSSClass = "";
+        string btnText = "";
+        if (i == 1)
+        {
+            cssClass = "active";
+        }
+        <div class="tab-pane @(cssClass)" id="RuleNumber_@(i)">
+                <div class="col-md-5">
+                    <h2><label class="text-decoration-underline">Rule Number @(i)</label></h2>
+                </div>
+                <div class="col-md-7 text-right">
+                    @if (Rule.IsActive)
+                    {
+                        btnCSSClass = "btn-warning btnDeActivate";
+                        btnText = "De Activate";
+                    }
+                    else
+                    {
+                        btnCSSClass = "btn-success btnActivate";
+                        btnText = "Activate";
+                    }
+                    <a class="btn @btnCSSClass" id="btnStatus_@(i)" data-RuleNumber="@(i)">@btnText</a>
+                    <a class="btn btn-primary btnValidateRule" data-RuleNumber="@(i)">Validate Rule</a>
+                    <input type="hidden" id="IsActive_@(i)_1" name="IsActive_@(i)_1" value="@(Rule.IsActive?"true":"false")"/>
+                    <input type="hidden" id="IsValid_@(i)_1" name="IsValid_@(i)_1" value="false" />
+                    @if (i > 1)
+                    {
+                        <a href="#" class="btn btn-danger btnRemoveRule" data-RuleNumber="@(i)"><i class="fa fa-remove"></i> Remove Rule</a>
+                    }
+                </div>
+            
+                <div class="col-lg-12">
+                    <div id="ConditionsDiv_@(i)">
+                        @if (ruleViewModel != null && ruleViewModel.Count > 0)
+                        {
+                            int j = 1;
+                            List<string> SelectedIds = new List<string>();
+                            foreach (var ruleView in ruleViewModel)
+                            {
+                                var strUpsells = string.Join(",", ruleView.Upsells);
+                                SelectedIds = new List<string>(strUpsells.Split(','));
+                                if (j == 1)
+                                {
+                                    <div id="Cond_@(i)_@(j)">
+                                        @*<div class="col-lg-12 text-right">
+                                            <a href="#" class="btn btn-danger btnRemoveRule" data-RuleNumber="@(i)"><i class="fa fa-remove"></i> Remove Rule</a>
+                                        </div>*@
+
+                                        <div class="row">
+                                            <div class="col-lg-3">
+                                                <div class="form-group">
+                                                    <label>Select Condition</label>
+                                                    <select id="ddlUpsellType_@(i)_@(j)" name="ddlUpsellType_@(i)_@(j)" data-CondNumber="1" data-RuleNumber="@(i)" class="form-control ddlUpsellType ddlUpsellType_@(i)">
+                                                        <option value="Bought">If Bought</option>
+                                                        <option value="NotBought" @(ruleView != null && ruleView.Type == "NotBought" ? "selected" : "")>If Not Bought</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-8">
+                                                <div class="form-group">
+                                                    <label>Select Products <span class="required-mark" id="spanddlUpsells_@(i)_@(j)">*</span></label>
+                                                    <select id="ddlUpsells_@(i)_@(j)" name="ddlUpsells_@(i)_@(j)[]" data-RuleNumber="@(i)" data-CondNumber="1" multiple="multiple" style="width: 100%" class="ddlUpsells form-control js-source-states ddlUpsells_@(i)">
+                                                        @if (Model.lstProductUpsells != null && Model.lstProductUpsells.Count > 0)
+                                                    {
+                                                        foreach (var item in Model.lstProductUpsells)
+                                                        {
+                                                            string Selceted = SelectedIds.Count > 0 && SelectedIds.Contains(item.Upsell.ToString()) == true ? "Selected" : "";
+                                                                <option value="@item.Upsell" @(Selceted)>@item.UpsellName</option>
+                                                        }
+                                                    }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-1">
+                                                <a class="btn btn-xs btn-success m-t-lg btnAddCond" href="#" data-RuleNumber="@(i)" data-CondNumber="@(ruleViewModel.Count)" data-Id="@(Rule!=null?Rule.Id:0)" id="btnAddCond_@(i)_@(j)" title="Add Condition"><i class="fa fa-plus"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div id="Cond_@(i)_@(j)">
+                                        <div class="row">
+                                            <div class="col-lg-4">
+                                                <div class="form-group">
+                                                    <select class="form-control ddlOperator" id="Opr_@(i)_@(j)" data-CondNumber="@(j)" data-RuleNumber="@(i)">
+                                                        <option value="∩">AND</option>
+                                                        <option value="∪" @(ruleView != null && ruleView.Operator == "∪" ? "selected" : "")>OR</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4"></div>
+                                            <div class="col-lg-4"></div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-3">
+                                                <div class="form-group">
+                                                    <label>Select Condition</label>
+                                                    <select id="ddlUpsellType_@(i)_@(j)" name="ddlUpsellType_@(i)_@(j)" data-CondNumber="@(j)" data-RuleNumber="@(i)" class="ddlUpsellType form-control ddlUpsellType_@(i)">
+                                                        <option value="Bought">If Bought</option>
+                                                        <option value="NotBought" @(ruleView != null && ruleView.Type == "NotBought" ? "selected" : "")>If Not Bought</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-8">
+                                                <div class="form-group">
+                                                    <label>Select Products <span class="required-mark" id="spanddlUpsells_@(i)_@(j)">*</span></label>
+                                                    <select id="ddlUpsells_@(i)_@(j)" name="ddlUpsells_@(i)_@(j)[]" data-CondNumber="@(j)" data-RuleNumber="@(i)" multiple="multiple" style="width: 100%" class="ddlUpsells form-control js-source-states ddlUpsells_@(i)">
+                                                        @if (Model.lstProductUpsells != null && Model.lstProductUpsells.Count > 0)
+                                                    {
+                                                        foreach (var item in Model.lstProductUpsells)
+                                                        {
+                                                            string Selceted = SelectedIds.Count > 0 && SelectedIds.Contains(item.Upsell.ToString()) == true ? "Selected" : "";
+                                                                <option value="@item.Upsell" @(Selceted)>@item.UpsellName</option>
+                                                        }
+                                                    }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-1">
+                                                <a class="btn btn-xs btn-danger m-t-lg btnRemoveCond" href="#" data-CondNumber="@(j)" data-RuleNumber="@(i)" id="btnRemoveCond_@(i)_@(j)" title="Remove Condition"><i class="fa fa-remove"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                j = j + 1;
+                            }
+                        }
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label>Set Precedence</label>
+                                <input type="text" id="Precedence_@(i)_1" name="Precedence_@(i)_1" class="Precedence form-control" disabled="disabled"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label for="Subject_@(i)_1">Subject <span class='required-mark' id="spanSubject_@(i)_1">*</span></label>
+                                <input type="text" id="Subject_@(i)_1" name="Subject_@(i)_1" data-RuleNumber="@(i)" class="form-control txtSubject" value="@(Rule!=null?Rule.Subject:"")" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label for="EmailBody_@(i)_1">Email Body <span class="required-mark" id="SpanEmailBody_@(i)_1">*</span></label>
+                                <textarea id="EmailBody_@(i)_1" name="EmailBody_@(i)_1" data-RuleNumber="@(i)" class="form-control EmailTextArea">@(Rule != null ? Rule.EmailContent : "")</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+
+        i = i + 1;
+    }
+}
+else
+{
+    string cssClass = "";
+    if (Model.RuleNumber == 1)
+    {
+        cssClass = "active";
+    }
+    <div class="tab-pane rulesTabContent @(cssClass)"  id="RuleNumber_@(Model.RuleNumber)">
+        
+        <div class="col-md-5">
+            <h2><label class="text-decoration-underline">Rule Number @(Model.RuleNumber)</label></h2>
+        </div>
+        <div class="col-md-7 text-right">
+            <a class="btn btn-success disabled btnActivate" id="btnStatus_@(Model.RuleNumber)" data-RuleNumber="@(Model.RuleNumber)">Activate</a>
+            <a class="btn btn-primary btnValidateRule" data-RuleNumber="@(Model.RuleNumber)">Validate Rule</a>
+            <input type="hidden" id="IsActive_@(Model.RuleNumber)_1" name="IsActive_@(Model.RuleNumber)_1" value="false" />
+            <input type="hidden" id="IsValid_@(Model.RuleNumber)_1" name="IsValid_@(Model.RuleNumber)_1" value="false" />
+            @if (Model.RuleNumber > 1)
+            {
+            <a href="#" class="btn btn-danger btnRemoveRule" data-RuleNumber="@(Model.RuleNumber)"><i class="fa fa-remove"></i> Remove Rule</a>
+            }
+        </div>
+
+            <div class="col-lg-12">
+                <div id="ConditionsDiv_@(Model.RuleNumber)">
+                    <div id="Cond_@(Model.RuleNumber)_1">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Select Condition</label>
+                                    <select id="ddlUpsellType_@(Model.RuleNumber)_1" name="ddlUpsellType_@(Model.RuleNumber)_1" data-CondNumber="1" data-RuleNumber="@(Model.RuleNumber)" class="form-control ddlUpsellType ddlUpsellType_@(Model.RuleNumber)">
+                                        <option value="Bought">If Bought</option>
+                                        <option value="NotBought">If Not Bought</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="form-group">
+                                    <label>Select Products <span class="required-mark" id="spanddlUpsells_@(Model.RuleNumber)_1">*</span></label>
+                                    <select id="ddlUpsells_@(Model.RuleNumber)_1" name="ddlUpsells_@(Model.RuleNumber)_1[]" data-RuleNumber="@(Model.RuleNumber)" data-CondNumber="1" multiple="multiple" style="width: 100%" class="ddlUpsells form-control js-source-states ddlUpsells_@(Model.RuleNumber)">
+                                        @if (Model.lstProductUpsells != null && Model.lstProductUpsells.Count > 0)
+                                    {
+                                        foreach (var item in Model.lstProductUpsells)
+                                        {
+                                                <option value="@item.Upsell">@item.UpsellName</option>
+                                        }
+                                    }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-1">
+                                <a class="btn btn-xs btn-success m-t-lg btnAddCond" href="#" data-Id="0" data-RuleNumber="@(Model.RuleNumber)" data-CondNumber="1" id="btnAddCond_@(Model.RuleNumber)_1" title="Add Condition"><i class="fa fa-plus"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label>Set Precedence</label>
+                            <input type="text" id="Precedence_@(Model.RuleNumber)_1" name="Precedence_@(Model.RuleNumber)_1" class="Precedence form-control" disabled="disabled" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="Subject_@(Model.RuleNumber)_1">Subject <span class='required-mark' id="spanSubject_@(Model.RuleNumber)_1">*</span></label>
+                            <input type="text" id="Subject_@(Model.RuleNumber)_1" name="Subject_@(Model.RuleNumber)_1" data-RuleNumber="@(Model.RuleNumber)" class="form-control txtSubject" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="EmailBody_@(Model.RuleNumber)_1">Email Body <span class="required-mark" id="SpanEmailBody_@(Model.RuleNumber)_1">*</span></label>
+                            <textarea id="EmailBody_@(Model.RuleNumber)_1" name="EmailBody_@(Model.RuleNumber)_1" data-RuleNumber="@(Model.RuleNumber)" class="form-control EmailTextArea"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+}
+

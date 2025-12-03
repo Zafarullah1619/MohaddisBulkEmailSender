@@ -1,0 +1,27 @@
+﻿@font-face {
+    font-family: 'Jameel Noori Nastaleeq';
+    src: url('/fonts/JameelNooriNastaleeq.woff2') format('woff2'), url('/fonts/JameelNooriNastaleeq.woff') format('woff'), url('/fonts/JameelNooriNastaleeq.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Mehr Nastaleeq';
+    src: url('/fonts/MehrNastaliqWeb.woff2') format('woff2'), url('/fonts/MehrNastaliqWeb.woff') format('woff'), url('/fonts/MehrNastaliqWeb.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'KFGQPC Uthman Taha Naskh';
+    src: url('/fonts/KFGQPCUthmanTahaNaskh.woff2') format('woff2'), url('/fonts/KFGQPCUthmanTahaNaskh.woff') format('woff'), url('/fonts/KFGQPCUthmanTahaNaskh.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'noorehuda';
+    src: url('webfonts/noorehudaRegular.woff') format('woff'), url('webfonts/noorehudaRegular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}

@@ -1,0 +1,240 @@
+﻿
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+label { font-weight: normal;}
+    /*.radioStrikeThrough ~ label{
+        font-weight: normal;
+        text-decoration: line-through;
+        opacity:  0.3;
+    }
+    input[type="radio"]:disabled ~ label 
+    {
+        font-weight: normal;
+        text-decoration: line-through;
+        opacity:  0.3;
+    }*/
+    .booking-page {
+        padding: 0 !important;
+        border: none !important;
+        background: #f9f9f9 !important;
+    }
+    .booking-page .col-md-1 { 
+        width: 11%;
+        text-align: center;
+    }
+    .booking-page .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .booking-page .btnNext,
+    .booking-page .btnPrevious {
+        display: block;
+        padding: 10px;
+        font-size: 16px;
+        line-height: 20px;
+        margin: 3px 0;
+    }
+    .booking-pages-r label{
+        padding-left: 0;
+        padding-bottom: 2px;
+        padding-top: 2px;
+    }
+    .booking-pages-r .iradio_square-green.checked.disabled,
+    .booking-pages-r .dis-lab { cursor: not-allowed;}
+    .booking-date {
+        font-family: Open Sans, sans-serif;
+        color: #fff;
+        background: #545454;
+        padding: 20px 0;
+    }
+    .booking-date span {
+        font-family: Open Sans, sans-serif;
+        font-size: 26px;
+        line-height: 34px;
+        font-weight: 300;
+        display: block;
+
+    }
+    .btnAddAppointment {
+        font-size: 16px;
+        line-height: 24px;
+        padding: 10px 20px;
+    }
+
+
+    .step-name {
+        background: rgba(0,0,0,0.5);
+        padding: 60px 0;
+    }
+    /*styling for timezone popup*/
+
+.time-zone {
+    display: table;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,0.2);
+    text-align: center;
+}
+.time-zone .holder {
+    display: table-cell;
+    vertical-align: middle;
+}
+.time-zone .box {
+    max-width: 500px;
+    margin: 0 auto;
+    background: rgba(0,0,0,0.5);
+}
+.time-zone h2 {
+    color: #fff;
+    margin: 0 0 20px;
+}
+.time-zone .form-control {
+    max-width: 300px;
+    margin: 0 auto 20px;
+}
+.time-zone .btn {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.app-info {
+    font-family:Open Sans, sans-serif;
+    padding: 20px 30px;
+    background: #313131;
+    border-bottom: 1px solid #717171;
+}
+.app-info strong {
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: bold;
+    color: #fff;
+}
+.app-info span {
+    font-size: 16px;
+    line-height: 18px;
+    padding: 5px 10px;
+    text-transform: capitalize;
+    color: #fff;
+    border-radius: 5px;
+}
+
+
+.done-app {
+    display: table;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,0.2);
+    text-align: left;
+}
+.done-app .holder {
+    display: table-cell;
+    vertical-align: middle;
+}
+.done-app .box {
+    max-width: 700px;
+    margin: 0 auto;
+    background: rgb(255,255,255);
+}
+.done-app h2 {
+    color: #333;
+    margin: 0 0 20px;
+    text-align: center;
+}
+.done-app .form-control {
+    max-width: 300px;
+    margin: 0 auto 20px;
+}
+.done-app label.lbl-bold {
+    font-weight: bold;
+    padding-left: 10px;
+}
+.done-app .btn {
+    max-width: 300px;
+    margin: 0 auto;
+}
+#addeventatc1-outlookcom { display: none;}
+
+.warning-mode {
+	width: 90px;
+    height: 90px;
+    border: 4px solid #EEA232;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    position: relative;
+	animation: pulse 1.2s infinite;
+}
+
+@-webkit-keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  0% {
+    opacity: 1;
+  }
+}
+.warning-mode-top {
+	position: absolute;
+    width: 5px;
+    height: 47px;
+    left: 50%;
+    top: 10px;
+    border-radius: 2px;
+    margin-left: -2px;
+    background-color: #f0ad4e;
+}
+.warning-mode-bottom {
+	position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-left: -3px;
+    left: 50%;
+    bottom: 10px;
+    background-color: #f0ad4e;
+}
+.main-modal { text-align: center;}
+.main-modal .modal-body{
+	padding: 30px !important;
+}
+.main-modal h3 {
+	font-size: 30px;
+	line-height: 36px;
+	font-family: 'PT Sans';
+	margin: 0;
+}
+.main-modal input[type="checkbox"]{
+	position: inherit;
+	margin: 0;
+}
+.main-modal .btn {
+	width: 200px;
+	padding: 15px;
+	font-size: 18px;
+	line-height: 22px;
+	color: #fff;
+}

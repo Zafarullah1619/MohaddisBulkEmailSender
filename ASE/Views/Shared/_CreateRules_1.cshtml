@@ -1,0 +1,60 @@
+﻿<div class="hpanel hblue">
+    <div class="panel-heading">
+        @*<div class="panel-tools">
+            <a class="showhide"><i class="fa fa-chevron-up"></i></a>
+        </div>
+        Rule Number @(ViewBag.RuleNumber)*@
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div id="ConditionsDiv_@(ViewBag.RuleNumber)">
+                <div id="Cond_@(ViewBag.RuleNumber)_1">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Select Upsell Type</label>
+                            <select id="ddlUpsellType_@(ViewBag.RuleNumber)_1" name="ddlUpsellType_@(ViewBag.RuleNumber)_1" data-CondNumber="1" data-RuleNumber="@(ViewBag.RuleNumber)" class="form-control ddlUpsellType ddlUpsellType_@(ViewBag.RuleNumber)">
+                                <option value="Bought">If Bought</option>
+                                <option value="NotBought">If Not Bought</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="form-group">
+                            <label>Select Upsell</label>
+                            <select id="ddlUpsells_@(ViewBag.RuleNumber)_1" name="ddlUpsells_@(ViewBag.RuleNumber)_1[]" data-RuleNumber="@(ViewBag.RuleNumber)" data-CondNumber="1" multiple="multiple" style="width: 100%" class="ddlUpsells form-control js-source-states ddlUpsells_@(ViewBag.RuleNumber)">
+                                @if (ViewBag.ProductUpsells != null && ViewBag.ProductUpsells.Count > 0)
+                            {
+                                foreach (var item in ViewBag.ProductUpsells)
+                                {
+                                        <option value="@item.Id">@item.UpsellName</option>
+                                }
+                            }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-1">
+                        <a class="btn btn-xs btn-success m-t-lg btnAddCond" href="#" data-RuleNumber="@(ViewBag.RuleNumber)" data-CondNumber="1" id="btnAddCond_@(ViewBag.RuleNumber)_1"><i class="fa fa-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label>Set Precedence</label>
+                    <input type="text" id="Precedence_@(ViewBag.RuleNumber)_1" name="Precedence_@(ViewBag.RuleNumber)_1" class="Precedence form-control" />
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" id="Subject_@(ViewBag.RuleNumber)_1" name="Subject_@(ViewBag.RuleNumber)_1" class="form-control" />
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <label>Email Body</label>
+                    <textarea id="EmailBody_@(ViewBag.RuleNumber)_1" name="EmailBody_@(ViewBag.RuleNumber)_1" class="form-control EmailTextArea"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,93 @@
+﻿@using ASE.Models
+@model LoginViewModel
+@{
+    Layout = "~/Views/Shared/_Layout_Blank.cshtml";
+    ViewBag.Title = "Log in";
+}
+
+
+<div class="login-container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="text-center m-b-md">
+                <h3>PLEASE LOGIN</h3>
+                @*<small>Use a local account to log in.</small>*@
+
+            </div>
+            <div class="hpanel">
+                <div class="panel-body">
+                    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form", @id = "loginForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @type = "text", @placeholder = "example", @title = "Please enter you Email" })
+                            <span class="help-block small">Your unique username to Login</span>
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "******", @title = "Please enter your password" })
+                            <span class="help-block small">Your strong password</span>
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                        </div>
+                        @*<div class="checkbox">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    @Html.CheckBoxFor(m => m.RememberMe, new { @class = "i-checks", @checked = "checked" })
+                                    @Html.LabelFor(m => m.RememberMe, new { @class = "control-label" })
+                                </div>
+                                <div class="col-sm-6 text-right">
+                                    @Html.ActionLink("Forgot Password", "ForgotPassword", "Account", new { })
+                                </div>
+                            </div>
+                        </div>*@
+                                        <input type="submit" value="Login" class="btn btn-success btn-block" />
+                                        <a class="btn btn-primary btn-block" href="@Url.Action("Register", "Account")">Register</a>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/validation/js")
+
+    <script>
+        $(document).ready(function () {
+            $("#loginForm").validate({
+
+                rules: {
+                    UserName: {
+                        required: true
+                    },
+                    Password: {
+                        required: true
+                    }
+                },
+                messages: {
+                    UserName: {
+                        required: "(Please Enter User name.)"
+                    },
+                    Password: {
+                        required: "(Please Enter Password.)"
+                    },
+                },
+                submitHandler: function (form) {
+                    form.submit();
+                },
+                errorPlacement: function (error, element) {
+                    $(element)
+                            .closest("form")
+                            .find("label[for='" + element.attr("id") + "']")
+                            .append(error);
+                },
+                errorElement: "span",
+            });
+        });
+    </script>
+}

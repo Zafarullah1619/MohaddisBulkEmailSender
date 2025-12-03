@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Send Emails to Subscribers</title>
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Send Emails to Subscribers</h1>
+    <button type="button" id="sendEmailButton">Send Emails</button>
+
+    <script>
+        $(document).ready(function () {
+            // Handle button click using AJAX
+            $('#sendEmailButton').click(function () {
+
+                // Send AJAX GET request
+                $.ajax({
+                    type: 'GET',
+                    url: 'http://localhost:52679/SubscriberProduct/SendEmailsAuto',
+                    success: function (response) {
+                        // Handle success response (e.g., show a message)
+                        alert('Emails sent successfully');
+                    },
+                    error: function () {
+                        // Handle error (e.g., show an error message)
+                        alert('Error sending emails');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

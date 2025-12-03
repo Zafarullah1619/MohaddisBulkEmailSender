@@ -1,0 +1,592 @@
+﻿@using Org.Business.Objects
+@using Newtonsoft.Json
+@model EmailViewModel
+@{
+    ViewBag.Title = "Send Email Manually";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="normalheader transition animated fadeIn">
+    <div class="hpanel">
+        <div class="panel-body">
+            <a class="small-header-action" href="">
+                <div class="clip-header">
+                    <i class="fa fa-arrow-up"></i>
+                </div>
+            </a>
+
+            <div id="hbreadcrumb" class="pull-right m-t-lg">
+                <ol class="hbreadcrumb breadcrumb">
+
+                    <li>
+                        <a href="@Url.Action("Index", "SubscriberProduct")">Products</a>
+                    </li>
+                    <li class="active">
+                        <span>@(ViewBag.Title) Product</span>
+                    </li>
+                </ol>
+            </div>
+            <h2 class="font-light m-b-xs">
+                @(ViewBag.Title)
+            </h2>
+            <small> Set Information to Send Email To Specfic Products</small>
+        </div>
+    </div>
+</div>
+
+<div class="content animate-panel">
+    <div class="row">
+        
+            <div class="col-lg-12">
+                <div class="hpanel">
+                     @using (Html.BeginForm())
+                     {
+
+                        <ul class="nav nav-tabs" id="myTab">
+                            <li class="active"><a data-toggle="tab" href="#selprod">Select Products</a></li>
+                            <li class="Tabs "><a data-toggle="tab" href="#emailsett">Email Settings</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+
+                            <div id="selprod" class="tab-pane active">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="hpanel  hgreen">
+                                                <div class="panel-heading">
+                                                    Select Products
+                                                </div>
+                                                <div class="panel-body">
+                                                    <div class="form-group">
+
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group">
+                                                                    <label for="EmailSubject">Email Subject <span class="required-mark">*</span></label>
+                                                                    <input type="text" id="EmailSubject" name="EmailSubject" class="form-control txtSubject" />
+                                                                    <span class="text-danger field-validation-error" data-valmsg-for="EmailSubject"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group">
+                                                                    <label for="SelectedProductIds">Select Product: <span class="required-mark">*</span></label>
+                                                                    <select id="SelectedProductIds" name="SelectedProductIds" class="form-control" multiple>
+                                                                        @foreach (var product in Model.ProductList)
+                                                                        {
+                                                                            <option value="@product.Id" @(Model.Product != null && Model.Product.Id == product.Id ? "selected=\"selected\"" : "")>@product.ProductName</option>
+                                                                        }
+                                                                    </select>
+                                                                    <span class="text-danger field-validation-error" data-valmsg-for="SelectedProductIds"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group">
+                                                                    <label for="Body">Email Body <span class="required-mark">*</span></label>
+                                                                    <textarea id="Body" name="Body" class="form-control EmailTextArea"></textarea>
+                                                                    <span class="text-danger field-validation-error" data-valmsg-for="Body"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="emailsett" class="tab-pane">
+                                <div class="panel-body">
+
+                                    <div class="hpanel  hgreen">
+                                        <div class="panel-heading">
+                                            Email Settings
+                                        </div>
+                                        <div class="panel-body" id="SMTPSettings">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+
+                                                        <div style="display: inline-block;">
+                                                            <input type="radio" id="IsSMTP" name="rdoAWS" value="false"
+                                                                   checked>
+                                                            <label for="IsSMTP">Send Using Custom SMTP</label>
+                                                        </div>
+
+                                                        <div style="display: inline-block;">
+                                                            <input type="radio" id="IsAWS" name="rdoAWS" value="true" @(Convert.ToBoolean(Model.EmailSmtpConfiguration.IsAWSBulkEmail) ? "checked" : "")>
+                                                            <label for="IsAWS">Send Using Amazon AWS</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row useSMTP @(Convert.ToBoolean(Model.EmailSmtpConfiguration.IsAWSBulkEmail)?"hidden":"")">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="Title">SMTP Title: <span class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control" placeholder="Title" name="EmailSmtpConfiguration.Title" id="Title" />
+                                                        <span class="text-danger field-validation-error" data-valmsg-for="EmailSmtpConfiguration.Title"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 hidden">
+                                                    <a href="#" class="btn btn-success m-t-md" id="btnSendTestEmail"><i class="fa fa-send-o"></i> Send Test Email</a>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="FromName">From Name: <span class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control" placeholder="From Name" name="EmailSmtpConfiguration.FromName" id="FromName" />
+                                                        <span class="text-danger field-validation-error" data-valmsg-for="EmailSmtpConfiguration.FromName"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+
+                                                    <div class="form-group">
+                                                        <label for="FromEmail">From Email: <span class="required-mark">*</span></label>
+                                                        <input type="email" class="form-control" placeholder="From Email" name="EmailSmtpConfiguration.FromEmail" id="FromEmail" />
+                                                        <span class="text-danger field-validation-error" data-valmsg-for="EmailSmtpConfiguration.FromEmail"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row useSMTP @(Convert.ToBoolean(Model.EmailSmtpConfiguration.IsAWSBulkEmail)?"hidden":"")">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="SmtpServer">SMTP Server/Hostname/IP Address: <span class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control" placeholder="SMTP Server" name="EmailSmtpConfiguration.SmtpServer" id="SmtpServer" />
+                                                        <span class="text-danger field-validation-error" data-valmsg-for="EmailSmtpConfiguration.SmtpServer"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3">
+                                                    <div class="">
+                                                        <div class="">
+                                                            <div class="form-group">
+                                                                <label for="SmtpPort">Port: <span class="required-mark">*</span>(Default:25,SSL:465)</label>
+                                                                <input type="text" class="form-control" placeholder="SMTP Port" name="EmailSmtpConfiguration.SmtpPort" id="SmtpPort" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Enable SSL:</label><br />
+                                                        <div data-toggle="buttons" class="btn-group radio-button-group">
+                                                            <label class="btn btn-default @(Convert.ToBoolean(Model.EmailSmtpConfiguration.EnableSSL)?"active":"")">
+                                                                <input type="radio" id="EnableSSLTrue" name="EmailSmtpConfiguration.EnableSSL" @(Convert.ToBoolean(Model.EmailSmtpConfiguration.EnableSSL) ? "checked=\"checked\"" : "")> Yes
+                                                            </label>
+                                                            <label class="btn btn-default @(!Convert.ToBoolean(Model.EmailSmtpConfiguration.EnableSSL)?"active":"")">
+                                                                <input type="radio" id="EnableSSLFalse" name="EmailSmtpConfiguration.EnableSSL" @(!Convert.ToBoolean(Model.EmailSmtpConfiguration.EnableSSL) ? "checked=\"checked\"" : "")> No
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row useSMTP @(Convert.ToBoolean(Model.EmailSmtpConfiguration.IsAWSBulkEmail)?"hidden":"")">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="SmtpUser">UserName/Email: <span class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control" placeholder="SMTP User" name="EmailSmtpConfiguration.SmtpUser" id="SmtpUser" />
+                                                        <span class="text-danger field-validation-error" data-valmsg-for="EmailSmtpConfiguration.SmtpUser"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="SmtpPassword">Password: <span class="required-mark">*</span></label>
+                                                        <input type="password" class="form-control" placeholder="SMTP Password" name="EmailSmtpConfiguration.SmtpPassword" id="SmtpPassword" />
+                                                        <span class="text-danger field-validation-error" data-valmsg-for="EmailSmtpConfiguration.SmtpPassword"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row useAWS @(Convert.ToBoolean(Model.EmailSmtpConfiguration.IsAWSBulkEmail)?"":"hidden")">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="AwsServiceURL">Aws Service URL: <span class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control" placeholder="Aws Service URL" name="EmailSmtpConfiguration.AwsServiceURL" id="AwsServiceURL" />
+                                                        <span class="text-danger field-validation-error" data-valmsg-for="EmailSmtpConfiguration.AwsServiceURL"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="AwsBulkEmailCount">Aws Bulk Email Count: <span class="required-mark">*</span></label>
+                                                        <input type="number" class="form-control" placeholder="Aws Bulk Email Count" name="EmailSmtpConfiguration.AwsBulkEmailCount" id="AwsBulkEmailCount" />
+                                                        <span class="text-danger field-validation-error" data-valmsg-for="EmailSmtpConfiguration.AwsBulkEmailCount"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row useAWS @(Convert.ToBoolean(Model.EmailSmtpConfiguration.IsAWSBulkEmail)?"":"hidden")">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="AwsSecretKey">Aws Secret Key: <span class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control" placeholder="Aws Secret Key" name="EmailSmtpConfiguration.AwsSecretKey" id="AwsSecretKey" />
+                                                        <span class="text-danger field-validation-error" data-valmsg-for="EmailSmtpConfiguration.AwsSecretKey"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="AwsAccessKeyId">Aws Access Key Id: <span class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control" placeholder="Aws Access Key Id" name="EmailSmtpConfiguration.AwsAccessKeyId" id="AwsAccessKeyId" />
+                                                        <span class="text-danger field-validation-error" data-valmsg-for="EmailSmtpConfiguration.AwsAccessKeyId"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group hidden">
+                                                <label for="SmtpDomain">SMTP Domain: <span class="required-mark">*</span></label>
+                                                <input type="text" class="form-control" placeholder="SMTP Domain" name="SmtpDomain" id="SmtpDomain" />
+                                            </div>
+                                            <div class="form-group hidden">
+                                                <label for="SmtpFooter">SMTP Footer:</label>
+                                                <input type="text" class="form-control" placeholder="Smtp Footer" name="SmtpFooter" id="SmtpFooter" />
+                                            </div>
+                                            <div class="form-group hidden">
+                                                <input type="checkbox" name="chkDefault" id="chkDefault" class=""> <label for="chkDefault">Mark this as Default SMTP?</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-right">
+                                        <a class="btn btn-default" href="@(Url.Action("Index","SubscriberProduct"))"><i class="fa fa-close"></i> Cancel</a>
+                                        <button type="button" id="emailsubmitbtn" class="btn btn-primary fa fa-send">Send Email</button>
+                                    </div>
+
+                                </div> 
+                            </div>
+              
+                        </div>
+                                
+                                
+                     }
+                </div>
+            </div>
+                
+    </div>
+
+</div>
+
+
+@section Styles {
+    @Styles.Render("~/bundles/select2/css")
+    @Styles.Render("~/bundles/datepicker/css")
+    @Styles.Render("~/bundles/bootstrapCheckbox/css")
+    @Styles.Render("~/bundles/sweetAlert/css")
+
+
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/moment/js")
+    @Scripts.Render("~/bundles/select2/js")
+    @Scripts.Render("~/bundles/datepicker/js")
+    @Scripts.Render("~/bundles/sweetAlert/js")
+
+    @Scripts.Render("~/bundles/validation/js")
+    @*<script src="~/Scripts/tinymce.min.js"></script>*@
+    @*<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>*@
+    <script src="~/Scripts/tinymce.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#SelectedProductIds').select2({
+                placeholder: 'Select Products',
+                allowClear: true, // This allows users to clear the selection
+                width: '100%' // Set the width of the dropdown to 100% of its parent container
+            });
+
+            InitializeTinyMCE();
+
+            $('input[type=radio][name=rdoAWS]').change(function () {
+
+                if (this.value == 'false') {
+                    $("#IsAWSBulkEmail").val('false');
+                    $(".useSMTP").removeClass("hidden");
+                    $(".useAWS").addClass("hidden");
+                }
+                else if (this.value == 'true') {
+                    $("#IsAWSBulkEmail").val('true');
+                    $(".useSMTP").addClass("hidden");
+                    $(".useAWS").removeClass("hidden");
+                }
+            });
+
+            $('#emailsubmitbtn').click(function (event) {
+                event.preventDefault();
+        // Clear previous validation messages
+        $(".field-validation-error").empty();
+
+
+
+        var selectedProductIds = $("#SelectedProductIds").val();
+        var emailSubject = $("#EmailSubject").val();
+        var body = tinymce.get("Body").getContent(); // Get content from TinyMCE
+
+        var isValid = true;
+
+        // Validate SelectedProductIds
+        if (selectedProductIds == null || selectedProductIds.length === 0) {
+            isValid = false;
+            $("#SelectedProductIds").next(".field-validation-error").text("Please Select at least One Product.");
+        }
+
+        // Validate EmailSubject
+        if (emailSubject === "") {
+            isValid = false;
+            $("#EmailSubject").next(".field-validation-error").text("Please Enter the Email Subject.");
+        }
+
+        // Validate Body
+        if (body === "") {
+            isValid = false;
+            $("#Body").next(".field-validation-error").text("Please add the Email Body.");
+        }
+
+                if ($("#IsSMTP:checked").length > 0) {
+                    if ($("#Title").val() === "") {
+                        isValid = false;
+                        $("#Title").next(".field-validation-error").text("Please enter SMTP Title.");
+                    }
+                    if ($("#FromName").val() === "") {
+                        isValid = false;
+                        $("#FromName").next(".field-validation-error").text("Please enter From Name.");
+                    }
+                    if ($("#FromEmail").val() === "") {
+                        isValid = false;
+                        $("#FromEmail").next(".field-validation-error").text("Please enter From Email.");
+                    }
+                    if ($("#SmtpServer").val() === "") {
+                        isValid = false;
+                        $("#SmtpServer").next(".field-validation-error").text("Please enter SMTP Server.");
+                    }
+                    if ($("#SmtpUser").val() === "") {
+                        isValid = false;
+                        $("#SmtpUser").next(".field-validation-error").text("Please enter SMTP User.");
+                    }
+                    if ($("#SmtpPassword").val() === "") {
+                        isValid = false;
+                        $("#SmtpPassword").next(".field-validation-error").text("Please enter SMTP Password.");
+                    }
+                }
+
+                if ($("#IsAWS:checked").length > 0) {
+                    if ($("#FromName").val() === "") {
+                        isValid = false;
+                        $("#FromName").next(".field-validation-error").text("Please enter From Name.");
+                    }
+                    if ($("#FromEmail").val() === "") {
+                        isValid = false;
+                        $("#FromEmail").next(".field-validation-error").text("Please enter From Email.");
+                    }
+                    if ($("#AwsServiceURL").val() === "") {
+                        isValid = false;
+                        $("#AwsServiceURL").next(".field-validation-error").text("Please enter AWS Service URL.");
+                    }
+                    if ($("#AwsBulkEmailCount").val() === "") {
+                        isValid = false;
+                        $("#AwsBulkEmailCount").next(".field-validation-error").text("Please enter AWS Bulk Email Count.");
+                    }
+                    if ($("#AwsSecretKey").val() === "") {
+                        isValid = false;
+                        $("#AwsSecretKey").next(".field-validation-error").text("Please enter AWS Secret Key.");
+                    }
+                    if ($("#AwsAccessKeyId").val() === "") {
+                        isValid = false;
+                        $("#AwsAccessKeyId").next(".field-validation-error").text("Please enter AWS Access Key Id.");
+                    }
+                }
+
+         if (!isValid) {
+            return false; // Prevent form submission if there are validation errors
+        }
+
+                ShowStickyPopup();
+        $.ajax({
+            url: '@Url.Action("SendEmailManually", "SubscriberProduct")',
+            data: {
+                "SelectedProductIds": selectedProductIds,
+                "EmailSubject": emailSubject,
+                "Body": body,
+                "EmailSmtpConfiguration.IsAWSBulkEmail": $("#IsAWS:checked").val(),
+                "EmailSmtpConfiguration.Title": $("#Title").val(),
+                "EmailSmtpConfiguration.FromName": $("#FromName").val(),
+                "EmailSmtpConfiguration.FromEmail": $("#FromEmail").val(),
+                "EmailSmtpConfiguration.SmtpServer": $("#SmtpServer").val(),
+                "EmailSmtpConfiguration.SmtpPort": $("#SmtpPort").val(),
+                "EmailSmtpConfiguration.EnableSSL": $("#EnableSSLTrue").prop("checked") ? true : ($("#EnableSSLFalse").prop("checked") ? false : null),
+                "EmailSmtpConfiguration.SmtpUser": $("#SmtpUser").val(),
+                "EmailSmtpConfiguration.SmtpPassword": $("#SmtpPassword").val(),
+                "EmailSmtpConfiguration.AwsServiceURL": $("#AwsServiceURL").val(),
+                "EmailSmtpConfiguration.AwsBulkEmailCount": $("#AwsBulkEmailCount").val(),
+                "EmailSmtpConfiguration.AwsSecretKey": $("#AwsSecretKey").val(),
+                "EmailSmtpConfiguration.AwsAccessKeyId": $("#AwsAccessKeyId").val(),
+                "EmailSmtpConfiguration.IsAWSBulkEmail": $("#IsAWS:checked").val()
+
+            },
+            type: "POST",
+            dataType: "json",
+            success: function (data) {
+               HideStickyPopup();
+
+                if (data.success) {
+                    // Redirect to the index page on success
+                    window.location.href = "@Url.Action("Index", "SubscriberProduct")";
+                }
+                else {
+                    swal({
+                        title: "Error!",
+                        text: "There was an error while sending emails through your SendEmailSettings. Please try again later.",
+                        type: "error"
+                    });
+                }
+            },
+            error: function (data) {
+                HideStickyPopup();
+                swal({
+                    title: "Error!",
+                    text: "There was an error while sending your SendEmailSettings. Please try again later.",
+                    type: "error"
+                });
+            }
+        });
+    });
+
+
+
+
+        });
+    </script>
+
+    <script>
+        function InitializeTinyMCE() {
+            tinymce.init({
+                selector: '.EmailTextArea',
+                height: 300,
+                theme: 'modern',
+                //relative_urls: true,
+                //remove_script_host: false,
+                convert_urls: false,
+                plugins: [
+                    'advlist autolink code lists link image charmap print preview hr anchor pagebreak',
+                    'searchreplace wordcount visualblocks visualchars code fullscreen',
+                    'insertdatetime media nonbreaking save table contextmenu directionality',
+                    'emoticons template paste textcolor colorpicker textpattern imagetools'
+                ],
+                toolbar1: 'insertfile undo redo | styleselect fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+                toolbar2: 'print preview media | forecolor backcolor emoticons',
+                fontsize_formats: "6pt 7pt 8pt 10pt 12pt 14pt 18pt 24pt 36pt",
+                image_advtab: true,
+                templates: [
+                    { title: 'Test template 1', content: 'Test 1' },
+                    { title: 'Test template 2', content: 'Test 2' }
+                ],
+                content_css: [
+                    '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                    '//www.tinymce.com/css/codepen.min.css'
+                ]
+            });
+        }
+
+
+    </script>
+}
+
+
+
+
+           @* $("#SendEmailManuallyForm").validate({
+                rules: {
+                    SelectedProductIds: {
+                        required: true
+                    },
+                    Subject: {
+                        required: true
+                    },
+                    Body: {
+                        required: true
+                    },
+                    Title: {
+                        required: true
+                    },
+                    FromName: {
+                        required: true
+                    },
+                    FromEmail: {
+                        required: true,
+                        email: true
+                    },
+                    SmtpServer: {
+                        required: true
+                    },
+                    SmtpPort: {
+                        required: true
+                    },
+                    SmtpUser: {
+                        required: true
+                    },
+                    SmtpPassword: {
+                        required: true
+                    },
+                    SmtpDomain: {
+                        required: true
+                    },
+                    AwsServiceURL: {
+                        required: true
+                    },
+                    AwsBulkEmailCount: {
+                        required: true,
+                        min: 1
+                    },
+                    AwsSecretKey: {
+                        required: true
+                    },
+                    AwsAccessKeyId: {
+                        required: true
+                    }
+                },
+                messages: {
+                    // Define error messages for each field
+                },
+                submitHandler: function (form) {
+                    form.submit();
+                },
+                errorPlacement: function (error, element) {
+                    $(element)
+                        .closest("form")
+                        .find("label[for='" + element.attr("id") + "']")
+                        .append(error);
+                },
+                errorElement: "span"
+            });
+
+            // Custom validation method for AwsBulkEmailCount
+            $.validator.addMethod("minValue", function (value, element, param) {
+                return value >= param;
+            }, "Please enter a value greater than or equal to {0}");
+
+            // Attach validation to AwsBulkEmailCount input
+            $("#AwsBulkEmailCount").rules("add", {
+                minValue: 1,
+                messages: {
+                    minValue: $.validator.format("Please enter a value greater than or equal to {0}")
+                }
+            });
+
+            $("#sendEmailButton").click(function () {
+                if ($("#SendEmailManuallyForm").valid()) {
+                    $("#SendEmailManuallyForm").submit();
+                }
+            });*@

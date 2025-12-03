@@ -1,0 +1,1194 @@
+﻿@using Org.Business.Objects
+@using System.Security.Claims
+@model ProductViewModal
+@{
+    ViewBag.Title = "Add Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="normalheader transition animated fadeIn">
+    <div class="hpanel">
+        <div class="panel-body">
+            <a class="small-header-action" href="">
+                <div class="clip-header">
+                    <i class="fa fa-arrow-up"></i>
+                </div>
+            </a>
+
+            <div id="hbreadcrumb" class="pull-right m-t-lg">
+                <ol class="hbreadcrumb breadcrumb">
+                    
+                    <li>
+                        <a href="@Url.Action("Index", "Product")">Products</a>
+                    </li>
+                    <li class="active">
+                        <span>@(ViewBag.Title) Product</span>
+                    </li>
+                </ol>
+            </div>
+            <h2 class="font-light m-b-xs">
+                @(ViewBag.Title)
+            </h2>
+            <small>@(ViewBag.Title) Information against this Product.</small>
+        </div>
+    </div>
+</div>
+
+<div class="content animate-panel">
+    <div class="row">
+
+        <div class="col-lg-12">
+            <div class="hpanel">
+
+                @{
+                    string Hidden = "hidden";
+                    if (Model.Product != null && Model.Product.Id > 0)
+                    {
+                        Hidden = "";
+                    }
+                }
+                <ul class="nav nav-tabs" id="myTab">
+                    <li class="active"><a data-toggle="tab" href="#info">General</a></li>
+                    <li class="Tabs @(Hidden)"><a data-toggle="tab" href="#email">Email Settings</a></li>
+                    <li class="Tabs @(Hidden)"><a data-toggle="tab" href="#rules">Product Rules</a></li>
+                </ul>
+
+                <div class="tab-content">
+
+                    <div id="info" class="tab-pane active">
+                        <div class="panel-body">
+                            @using (Html.BeginForm("UpdateProductInfo", "Product", FormMethod.Post, new { role = "form", @id = "BasicInfoForm" }))
+                            {
+                                <div class="row">
+
+                                    <div class="col-lg-12">
+                                        <div class="hpanel  hgreen">
+                                            <div class="panel-heading">
+                                                General Information
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="form-group">
+
+                                                    <div class="row">
+                                                        <div class="col-lg-8">
+                                                            <div class="form-group">
+                                                                <label for="ProductName">Product Name: <span class="required-mark">*</span></label>
+                                                                <input type="text" class="form-control" id="ProductName" name="ProductName" value="@(Model.Product !=null && Model.Product.Id > 0 ? Model.Product.ProductName : "")" />
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="DataBaseName">Database Name: <span class="required-mark">*</span></label>
+                                                                <input type="text" class="form-control" id="DataBaseName" name="DataBaseName" value="@(Model.Product !=null && Model.Product.Id > 0 ? Model.Product.DataBaseName : "")" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group">
+                                                                <label for="DBServer">DB Server: <span class="required-mark">*</span></label>
+                                                                <input type="text" class="form-control" id="DBServer" name="DBServer" value="@(Model.Product !=null && Model.Product.Id > 0 ? Model.Product.DBServer : "")" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-3">
+                                                            <div class="form-group">
+                                                                <label for="DBUserName">DB Username: <span class="required-mark">*</span></label>
+                                                                <input type="text" class="form-control" id="DBUserName" name="DBUserName" value="@(Model.Product !=null && Model.Product.Id > 0 ? Model.Product.DBUserName : "")" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-3">
+                                                            <div class="form-group">
+                                                                <label for="DBPassword">DB Password:</label>
+                                                                <input type="text" class="form-control" id="DBPassword" name="DBPassword" value="@(Model.Product !=null && Model.Product.Id > 0 ? Model.Product.DBPassword : "")" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-2">
+                                                            <div class="form-group">
+                                                                <label for="DBServerType">DB Server Type: <span class="required-mark">*</span></label>
+                                                                <select id="DBServerType" name="DBServerType" class="form-control">
+                                                                    <option value="">Select Type</option>
+                                                                    <option value="MSSQL" @(Model.Product !=null && Model.Product.Id > 0 && Model.Product.DBServerType == "MSSQL" ? "selected=\"selected\"" : "")>MS SQL</option>
+                                                                    <option value="MySQL" @(Model.Product !=null && Model.Product.Id > 0 && Model.Product.DBServerType == "MySQL" ? "selected=\"selected\"" : "")>My SQL</option>
+                                                                    <option value="SQLLite" @(Model.Product !=null && Model.Product.Id > 0 && Model.Product.DBServerType== "SQLLite" ? "selected=\"selected\"" : "")>SQL Lite</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="productUpsells">
+
+                                                        @if (Model.lstProductUpsells != null && Model.lstProductUpsells.Count > 0)
+                                                        {
+                                                            int i = 0;
+                                                            foreach (var item in Model.lstProductUpsells)
+                                                            {
+                                                                if (i == 0)
+                                                                {
+                                                                    <div class="col-lg-4">
+                                                                        <div class="form-group">
+                                                                            <label for="FrontEnd">Front End: <span class="required-mark">*</span></label>
+                                                                            <input type="text" class="form-control Upsell FrontEndName" id="FrontEnd" name="FrontEnd" data-Upsell="FE" data-upsellID="@(item.Id)" value="@item.UpsellName" />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-2">
+                                                                        <a href="#" class="btn btn-xs btn-success m-t-lg" id="addNewUpsell" data-lastupsellcount="0" title="Add New Upsell"><i class="fa fa-plus"></i> Add New Upsell</a>
+                                                                    </div><div class="clearfix"></div>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <div id="divUpsell_@(i)">
+                                                                        <div class="col-lg-4">
+                                                                            <div class="form-group">
+                                                                                <label class="UpsellLabel" for="Upsell_@(i)">Upsell @(i)</label>
+                                                                                <input type="text" class="form-control Upsell UpsellName" id="Upsell_@(i)" name="Upsell_@(i)" data-Upsell="UP@(i)" data-upsellID="@(item.Id)" value="@item.UpsellName">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-2">
+                                                                            <a href="#" class="btn btn-xs btn-danger m-t-lg DeleteUpsell" data-upsell="@(i)" id="DeleteUpsell_@(i)" title="Delete this Upsell"><i class="fa fa-remove"></i> Remove Upsell</a>
+                                                                        </div>
+                                                                    </div><div class="clearfix"></div>
+                                                                }
+
+                                                                i = i + 1;
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+
+                                                            <div class="col-lg-4">
+                                                                <div class="form-group">
+                                                                    <label for="FrontEnd">Front End: <span class="required-mark">*</span></label>
+                                                                    <input type="text" class="form-control Upsell" id="FrontEnd" name="FrontEnd" data-Upsell="FE" data-upsellID="0" value="" />
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-2">
+                                                                <a href="#" class="btn btn-xs btn-success m-t-lg" id="addNewUpsell" data-lastupsellcount="0" title="Add New Upsell"><i class="fa fa-plus"></i></a>
+                                                            </div><div class="clearfix"></div>
+                                                        }
+                                                        <input type="hidden" id="UpsellCount" name="UpsellCount" value="@(Model.lstProductUpsells != null && Model.lstProductUpsells.Count > 0?(Model.lstProductUpsells.Count-1):0)" />
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-12 text-right">
+                                                            <a class="btn btn-default" href="@(Url.Action("Index","Product"))"><i class="fa fa-close"></i> Cancel</a>
+                                                            <a href="#" class="btn btn-primary" id="btnAddProductInfo"><i class="fa fa-save"></i> Save</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div id="email" class="tab-pane">
+                        <div class="panel-body">
+                            @using (Html.BeginForm("SMTPConfigurations", "Product", FormMethod.Post, new { role = "form", @id = "SMTPConfigForm" }))
+                            {
+
+                                <div class="hpanel  hgreen">
+                                    <div class="panel-heading">
+                                        Email Settings
+                                    </div>
+                                    <div class="panel-body" id="SMTPSettings">
+
+                                    </div>
+
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div id="rules" class="tab-pane">
+                        <div class="panel-body">
+                            @using (Html.BeginForm("UpdateInfo", "Contacts", FormMethod.Post, new { role = "form", @id = "RulesForm" }))
+                            {
+                                <div class="row">
+
+                                    <div class="col-lg-12">
+                                        <div class="hpanel hgreen">
+                                            <div class="panel-heading">
+                                                Product Rules
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group text-right">
+                                                            <a class="btn btn-success pull-left" id="btnAddNewRule"><i class="fa fa-plus"></i> Add New Rule</a>
+                                                            <a href="#" class="btn btn-primary" id="btnAddProductRules"><i class="fa fa-save"></i> Save</a>
+                                                            <a class="btn btn-default" href="@(Url.Action("Index","Product"))"><i class="fa fa-close"></i> Cancel</a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-12">
+                                                        <div class="col-lg-2">
+                                                            <ul class="nav nav-tabs" id="RuleTabs">
+                                                                @if (Model.lstProductRules != null && Model.lstProductRules.Count > 0)
+                                                                {
+                                                                    int r = 1;
+                                                                    foreach (var item in Model.lstProductRules)
+                                                                    {
+                                                                        string cssClass = "";
+                                                                        if (r == 1)
+                                                                        {
+                                                                            cssClass = "active";
+                                                                        }
+                                                                        <li class="liRule @(cssClass)" id="liRule_@(r)"><a data-toggle="tab" href="#RuleNumber_@(r)">Rule Number @(r)</a></li>
+                                                                        r = r + 1;
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <li class="liRule active" id="liRule_1"><a data-toggle="tab" href="#RuleNumber_1">Rule Number 1</a></li>
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                        <div id="divRules" class="tab-content col-lg-10">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="RuleNumber" name="RuleNumber" value="@(Model!=null && Model.lstProductRules!=null && Model.lstProductRules.Count>0 ? Model.lstProductRules.Count:1)" />
+<input type="hidden" id="RuleCount" name="RuleCount" value="@(Model!=null && Model.lstProductRules!=null && Model.lstProductRules.Count>0 ? Model.lstProductRules.Count:1)" />
+<input type="hidden" id="CondNumber" name="CondNumber" value="2" />
+<input type="hidden" id="ProductId" name="ProductId" value="@(Model!=null && Model.Product != null && Model.Product.Id > 0?Model.Product.Id:0)" />
+<input type="hidden" id="tabURL" name="tabURL" />
+
+@section Styles {
+    @Styles.Render("~/bundles/select2/css")
+    @Styles.Render("~/bundles/datepicker/css")
+    @Styles.Render("~/bundles/bootstrapCheckbox/css")
+    @Styles.Render("~/bundles/sweetAlert/css")
+
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/moment/js")
+    @Scripts.Render("~/bundles/select2/js")
+    @Scripts.Render("~/bundles/datepicker/js")
+    @Scripts.Render("~/bundles/sweetAlert/js")
+
+    @Scripts.Render("~/bundles/validation/js")
+    @*<script src="~/Scripts/tinymce.min.js"></script>*@
+    @*<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>*@
+<script src="~/Scripts/tinymce.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            var ProductId = $("#ProductId").val();
+            var RuleNumber = $("#RuleNumber").val();
+            $("#divRules").html("");
+            AddNewRule(ProductId, RuleNumber, false);
+            SMTPSettings();
+
+        })
+
+        $('#myTab a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+
+        // store the currently selected tab in the hash value
+        $("ul#myTab > li > a").on("shown.bs.tab", function (e) {
+            var id = $(e.target).attr("href").substr(1);
+            window.location.hash = id;
+            console.log("href: " + window.location.href)
+            $("#tabURL").val(window.location.href);
+            //window.location.pathname
+        });
+
+        // on load of the page: switch to the currently selected tab
+        var hash = window.location.hash;
+        $('#myTab a[href="' + hash + '"]').tab('show');
+
+        function SetPrecedence(RuleNumber) {
+
+            for (j = 1; j <= RuleNumber; j++) {
+                var CondNumber = $("#btnAddCond_" + j + "_1").attr("data-CondNumber");
+                var textDDL = "";
+
+                for (i = 1; i <= CondNumber; i++) {
+                    var text1 = $('#ddlUpsells_' + j + '_' + i + ' option:selected').toArray().map(item => item.text).join();
+                    var Vlues = $('#ddlUpsells_' + j + '_' + i).val();
+                    var Type1 = $("#ddlUpsellType_" + j + "_" + i).val();
+                    var operator = "";
+                    if (CondNumber > 1 && $("#Opr_" + j + "_" + (i + 1)).length) {
+                        operator = $("#Opr_" + j + "_" + (i + 1)).val();
+                    }
+                    textDDL += Type1 + "(" + Vlues + ") " + operator + " ";
+                }
+                textDDL = textDDL.replace(/\,/g, ' ∩ ');
+                //console.log("textDDL " + textDDL);
+                //console.log("j " + j);
+                $("#Precedence_" + j + "_1").val(textDDL);
+            }
+        }
+
+        function SMTPSettings() {
+            var ProductId = $("#ProductId").val();
+            $.ajax({
+                url: '@Url.Action("ProductSMTPSettingsPartial", "Product")',
+                data: {
+                    "ProductId": ProductId
+                },
+                type: "POST",
+                dataType: "html",
+                success: function (data) {
+                    $("#SMTPSettings").append(data);
+                },
+                error: function (data) {
+                }
+            });
+        }
+
+        function InitializeTinyMCE() {
+            tinymce.init({
+                selector: '.EmailTextArea',
+                height: 300,
+                theme: 'modern',
+                //relative_urls: true,
+                //remove_script_host: false,
+                convert_urls: false,
+                plugins: [
+                  'advlist autolink code lists link image charmap print preview hr anchor pagebreak',
+                  'searchreplace wordcount visualblocks visualchars code fullscreen',
+                  'insertdatetime media nonbreaking save table contextmenu directionality',
+                  'emoticons template paste textcolor colorpicker textpattern imagetools'
+                ],
+                toolbar1: 'insertfile undo redo | styleselect fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+                toolbar2: 'print preview media | forecolor backcolor emoticons',
+                fontsize_formats: "6pt 7pt 8pt 10pt 12pt 14pt 18pt 24pt 36pt",
+                image_advtab: true,
+                templates: [
+                  { title: 'Test template 1', content: 'Test 1' },
+                  { title: 'Test template 2', content: 'Test 2' }
+                ],
+                content_css: [
+                  '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                  '//www.tinymce.com/css/codepen.min.css'
+                ]
+            });
+        }
+
+        function AddNewRule(ProductId, RuleNumber, FromScratch) {
+
+            $.ajax({
+                url: '@Url.Action("RenderCreateRulePartial", "Product")',
+                data: {
+                    "ProductId": ProductId,
+                    "RuleNumber": RuleNumber,
+                    "FromScratch": FromScratch
+                },
+                type: "POST",
+                dataType: "html",
+                success: function (data) {
+                    //ShowStickyPopup();
+                    console.log("Sticky Popup Show");
+                    $("#divRules").append(data);
+
+                    InitializeTinyMCE();
+
+                    ////HideStickyPopup();
+                    console.log("Sticky Popup hide");
+                    $("select.js-source-states").select2('destroy');
+                    $("select.js-source-states").select2();
+                    if (FromScratch == false) {
+                        var ProductRules = '@(Model!=null && Model.lstProductRules!=null && Model.lstProductRules.Count>0 ? Model.lstProductRules.Count:0)';
+                        SetPrecedence(ProductRules);
+                    }
+                    if (FromScratch == true && parseInt(RuleNumber) > 1) {
+                        $("ul#RuleTabs").append('<li class="liRule" id="liRule_' + RuleNumber + '"><a data-toggle="tab" href="#RuleNumber_' + RuleNumber + '">Rule Number ' + RuleNumber + '</a></li>');
+                        //$('ul#RuleTabs a[href="#RuleNumber_' + RuleNumber + '"]').trigger('click');
+                        ////HideStickyPopup();
+                        ReArrangeRules();
+                    }
+                    ////HideStickyPopup();
+                },
+                error: function (data) {
+                    ////HideStickyPopup();
+                }
+            });
+        }
+
+        function LoadExistingRules(ProductId, RuleNumber) {
+            $.ajax({
+                url: '@Url.Action("RenderCreateRulePartial", "Product")',
+                data: {
+                    "ProductId": ProductId,
+                    "RuleNumber": RuleNumber
+                },
+                type: "POST",
+                dataType: "html",
+                success: function (data) {
+                    $("#divRules").append(data);
+                    InitializeTinyMCE();
+                    ////HideStickyPopup();
+                    $("select.js-source-states").select2('destroy');
+                    $("select.js-source-states").select2();
+                },
+                error: function (data) {
+                    ////HideStickyPopup();
+                }
+            });
+        }
+
+        $("#btnAddProductRules").click(function () {
+            var mainList = [];
+            //ShowStickyPopup();
+            $('.btnAddCond').each(function (i, obj) {
+                var list = [];
+                var RuleNumber = $(this).attr("data-RuleNumber");
+                var CondNumber = $(this).attr("data-CondNumber");
+                var RuleId = $(this).attr("data-Id");
+
+                var j = RuleNumber;
+                for (i = 1; i <= CondNumber; i++) {
+                    console.log("J " + j + " I " + i);
+                    var post_data = {};
+                    var UpsellType = $("#ddlUpsellType_" + j + "_" + i).val();
+                    var Upsells = $("#ddlUpsells_" + j + "_" + i).val();
+
+                    if (i > 1) {
+                        var Operator = $("#Opr_" + j + "_" + i).val();
+                        post_data["Operator"] = Operator;
+                        //list.push(JSON.stringify("Operator : " + Operator));
+
+                    }
+                    post_data["Type"] = UpsellType;
+                    post_data["Upsells"] = Upsells;
+                    list.push(post_data)
+                }
+
+                var EmailSubject = $("#Subject_" + j + "_1").val();
+                var EmailBody = tinyMCE.get('EmailBody_' + j + "_1").getContent();
+                var txt = JSON.stringify(list);
+                SetPrecedence(RuleNumber);
+                var txtRule = $("#Precedence_" + j + "_1").val();
+                txtRule = txtRule.replace(/\∩/g, 'AND').replace(/\∪/g, 'OR');
+                var ProductId = $("#ProductId").val();
+                var IsActive = $("#IsActive_" + j + "_1").val();
+
+                mainList.push({
+                    RuleId: RuleId,
+                    Rules: txtRule,
+                    IsActive: IsActive,
+                    RulesJson: txt,
+                    Subject: EmailSubject,
+                    ProductId: ProductId,
+                    EmailBody: EmailBody
+                })
+
+            });
+
+            $.ajax({
+                url: '@Url.Action("SaveProductRules", "Product")',
+                data: JSON.stringify(mainList),
+                type: "POST",
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                success: function (data) {
+                    var URL = $("#tabURL").val();
+
+                    window.location.hash = 'rules';
+                    window.location.reload();
+
+                },
+                error: function (data) {
+                    //HideStickyPopup();
+                }
+            })
+            console.log(mainList);
+        })
+
+        function b64EncodeUnicode(str) {
+
+            return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+                function toSolidBytes(match, p1) {
+                    return String.fromCharCode('0x' + p1);
+                }));
+        }
+
+        $(document).on("click", "#btnAddSMTPConfig", function () {
+            if (!$("#SMTPConfigForm").valid()) {
+                return false;
+            }
+            //ShowStickyPopup();
+            var EnableSSL = false;
+            var isChecked = $('#EnableSSLTrue').prop('checked');
+            if (isChecked) {
+                EnableSSL = true;
+            }
+            $.ajax({
+                url: '@Url.Action("SMTPConfigurations", "Product")',
+                data: {
+                    "ProductId": $("#ProductId").val(),
+                    "Title": $("#Title").val(),
+                    "FromName": $("#FromName").val(),
+                    "FromEmail": $("#FromEmail").val(),
+                    "SmtpServer": $("#SmtpServer").val(),
+                    "SmtpPort": $("#SmtpPort").val(),
+                    "SmtpUser": $("#SmtpUser").val(),
+                    "SmtpPassword": $("#SmtpPassword").val(),
+                    "SmtpDomain": $("#SmtpDomain").val(),
+                    "SmtpFooter": $("#SmtpFooter").val(),
+                    "SSLPort": $("#SSLPort").val(),
+                    "PostMarkSignatureId": $("#PostMarkSignatureId").val(),
+                    "IsDefault": $("#IsDefault").val(),
+                    "EnableSSL": EnableSSL,
+                    "Id": $("#Id").val(),
+                    
+                    "IsAWSBulkEmail": $("#IsAWSBulkEmail").val(),
+                    "AwsServiceURL": $("#AwsServiceURL").val(),
+                    "AwsBulkEmailCount": $("#AwsBulkEmailCount").val(),
+                    "AwsAccessKeyId": $("#AwsAccessKeyId").val(),
+                    "AwsSecretKey": $("#AwsSecretKey").val(),
+                },
+                type: "POST",
+                dataType: "json",
+                success: function (data) {
+                    //SMTPSettings();
+                    window.location.hash = 'email';
+                    window.location.reload();
+                    //HideStickyPopup();
+                },
+                error: function (data) {
+                    //HideStickyPopup();
+                }
+            });
+            //$("#SMTPConfigForm").submit();
+        })
+
+        $("#btnAddProductInfo").click(function () {
+            if (!$("#BasicInfoForm").valid()) {
+                return false;
+            }
+            var strUpsells = "";
+            var strUpsellIDs = "";
+            $('.Upsell').each(function (i, obj) {
+                var text = $(this).val();
+                var upsellID = $(this).attr("data-upsellID");
+                var Upsell = $(this).attr("data-Upsell");
+                strUpsellIDs += upsellID + ",";
+                if (text != null && text != "") {
+                    strUpsells += upsellID + "`" + Upsell + "::" + text + "~";
+                }
+
+            });
+            var strUpsells = btoa(strUpsells);
+            console.log("btoaStr " + strUpsells);
+
+            var atobStr = atob(strUpsells);
+            console.log("atob " + atobStr);
+
+            var ProductName = $("#ProductName").val();
+            var DataBaseName = $("#DataBaseName").val();
+            var DBServer = $("#DBServer").val();
+            var DBUserName = $("#DBUserName").val();
+            var DBPassword = $("#DBPassword").val();
+            var DBServerType = $("#DBServerType").val();
+
+            $.ajax({
+                url: '@Url.Action("UpdateProductInfo", "Product")',
+                data: {
+                    "ProductId": $("#ProductId").val(),
+                    "ProductName": ProductName,
+                    "DBServer": DBServer,
+                    "DBUserName": DBUserName,
+                    "DBPassword": DBPassword,
+                    "DataBaseName": DataBaseName,
+                    "Upsells": strUpsells,
+                    "UpsellIDs": strUpsellIDs,
+                    "DBServerType": DBServerType
+                },
+                type: "POST",
+                dataType: "json",
+                success: function (data) {
+                    window.location.hash = 'info';
+
+                    window.location.href = "@Url.Action("AddEdit", "Product")?ProductId=" + data + "";
+
+                    //window.location.reload();
+                },
+                error: function (data) {
+                }
+            });
+        })
+
+        $(document).on("click", ".btnDeActivate", function () {
+            $(this).removeClass("btn-warning btnDeActivate");
+            $(this).addClass("btn-success btnActivate");
+            $(this).html("Activate");
+            var RuleNumber = $(this).attr("data-RuleNumber");
+            $("#IsActive_" + RuleNumber + "_1").val("false");
+        })
+
+        $(document).on("click", ".btnActivate", function () {
+            $(this).removeClass("btn-success btnActivate");
+            $(this).addClass("btn-warning btnDeActivate");
+            $(this).html("De Activate");
+            var RuleNumber = $(this).attr("data-RuleNumber");
+            $("#IsActive_" + RuleNumber + "_1").val("true");
+        })
+
+        $("#btnAddNewRule").click(function () {
+            var ProductId = $("#ProductId").val();
+            var RuleNumber = $("#RuleNumber").val();
+            RuleNumber = parseInt(RuleNumber) + 1;
+            AddNewRule(ProductId, RuleNumber, true);
+            $("#RuleNumber").val(RuleNumber);
+            var RuleCount = $("#RuleCount").val();
+            RuleCount = parseInt(RuleCount) + 1;
+            $("#RuleCount").val(RuleCount);
+
+            window.location.hash = "";
+            window.location.hash = "rules";
+            //window.location.hash = 'rules';
+
+        })
+
+        $(document).on("change", ".ddlUpsells, .ddlUpsellType, .ddlOperator", function () {
+
+            var RuleNumber = $(this).attr("data-RuleNumber");
+            //var CondNumber = $(this).attr("data-CondNumber");
+            var CondNumber = $("#btnAddCond_" + RuleNumber + "_1").attr("data-CondNumber");
+
+
+            var textDDL = "";
+
+            for (i = 1; i <= CondNumber; i++) {
+                var text1 = $('#ddlUpsells_' + RuleNumber + '_' + i + ' option:selected').toArray().map(item => item.text).join();
+                var Vlues = $('#ddlUpsells_' + RuleNumber + '_' + i).val();
+                //console.log("Vlues " + Vlues)
+                var Type1 = $("#ddlUpsellType_" + RuleNumber + "_" + i).val();
+                var operator = "";
+                if (CondNumber > 1 && $("#Opr_" + RuleNumber + "_" + (i + 1)).length) {
+                    operator = $("#Opr_" + RuleNumber + "_" + (i + 1)).val();
+                }
+                textDDL += Type1 + "(" + Vlues + ") " + operator + " ";
+            }
+
+            textDDL = textDDL.replace(/\,/g, ' ∩ ');
+
+            $("#Precedence_" + RuleNumber + "_1").val(textDDL);
+
+            //ValidateRule(RuleNumber);
+        })
+
+        $(document).on("change", ".ddlUpsells", function () {
+            var RuleNumber = $(this).attr("data-RuleNumber");
+            UpdateRuleStatus(RuleNumber);
+        })
+
+        function GetSelectValues(select) {
+            var result = [];
+            var options = select && select.options;
+            var opt;
+
+            for (var i = 0, iLen = options.length; i < iLen; i++) {
+                opt = options[i];
+
+                if (opt.selected) {
+                    result.push(opt.value || opt.text);
+                }
+            }
+            return result;
+        }
+
+        $(document).on("click", ".btnAddCond", function () {
+            var RuleNumber = $(this).attr("data-RuleNumber"); //$("#CondNumber").val();
+            var CondNo = $(this).attr("data-CondNumber"); //$("#CondNumber").val();
+            var NextCondNo = parseInt(CondNo) + 1;
+            $(this).attr("data-CondNumber", NextCondNo);
+            $.ajax({
+                url: '@Url.Action("UpsellConditionPartial", "Product")',
+                data: {
+                    "ProductId": $("#ProductId").val(),
+                    "RuleNumber": RuleNumber,
+                    "CondNumber": NextCondNo
+                },
+                type: "POST",
+                dataType: "html",
+                success: function (data) {
+                    $("#ConditionsDiv_" + RuleNumber).append(data);
+                    $("select.js-source-states").select2('destroy');
+                    $("select.js-source-states").select2();
+                    window.location.hash = "";
+                    window.location.hash = "rules";
+                },
+                error: function (data) {
+                }
+            });
+        })
+
+        $("#chkEnableSSL").change(function () {
+            if ($(this).prop('checked') == true) {
+                $("#SmtpPort").val("465");
+                $("#EnableSSL").val("true");
+            } else {
+                $("#SmtpPort").val("2525");
+                $("#EnableSSL").val("false");
+            }
+        });
+
+        $("#addNewUpsell").click(function () {
+
+            var lastupsellcount = $(this).attr("data-lastupsellcount");
+            lastupsellcount = parseInt(lastupsellcount) + 1;
+
+            var UpsellCount = $("#UpsellCount").val();
+            UpsellCount = parseInt(UpsellCount) + 1;
+
+            var Html = '<div id="divUpsell_' + lastupsellcount + '"><div class="col-lg-4"><div class="form-group"><label class="UpsellLabel" for="Upsell_' + lastupsellcount + '">Upsell ' + UpsellCount + '</label>';
+            Html += '<input type="text" class="form-control Upsell" data-upsellID="0" id="Upsell_' + lastupsellcount + '" name="Upsell_' + lastupsellcount + '" data-Upsell="UP' + UpsellCount + '" value="" /></div></div><div class="col-lg-2">';
+            Html += '<a href="#" class="btn btn-xs btn-danger m-t-lg DeleteUpsell" data-upsell="' + lastupsellcount + '" id="DeleteUpsell_' + lastupsellcount + '" title="Remove this Upsell"><i class="fa fa-remove"></i> Remove Upsell</a></div></div><div class="clearfix"></div>';
+
+            $(this).attr("data-lastupsellcount", lastupsellcount);
+
+            $("#UpsellCount").val(UpsellCount);
+            $("#productUpsells").append(Html);
+
+        })
+
+        $(document).on("click", ".btnRemoveRule", function () {
+            var RuleNumber = $(this).attr("data-RuleNumber");
+            var chk = $(this);
+            swal({
+                title: "Remove Rule",
+                text: "Are you sure to remove Rule?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: '#D24637',
+                confirmButtonText: 'Yes, I am sure!',
+                cancelButtonText: "No, cancel it!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+               function (isConfirm) {
+                   if (isConfirm) {
+                       $("#RuleNumber_" + RuleNumber).remove();
+                       $("#liRule_" + RuleNumber).remove();
+
+                       ReArrangeRules();
+                       RuleNumber = parseInt(RuleNumber) - 1;
+                       $('#RuleTabs a[href="#RuleNumber_' + RuleNumber + '"]').trigger('click');
+                       window.location.hash = "";
+                       window.location.hash = "rules";
+                   }
+                   else {
+                       window.location.hash = "";
+                       window.location.hash = "rules";
+                   }
+               });
+
+        })
+
+        function ReArrangeRules() {
+            //ShowStickyPopup();
+            var i = 1;
+            var j = 1;
+            var RuleCount = $("#RuleCount").val();
+            RuleCount = parseInt(RuleCount) - 1;
+            $(".liRule").each(function () {
+
+                var newCount = parseInt(RuleCount) - parseInt(i);
+                i = parseInt(i) + 1;
+                var newRuleCount = parseInt(RuleCount) - parseInt(newCount);
+                //$(this).attr("id", "liRule_" + newRuleCount);
+                //$(this).find("a").attr("href", "#RuleNumber_" + newRuleCount);
+                $(this).find("a").html("Rule Number " + newRuleCount);
+            });
+
+            $(".rulesTabContent").each(function () {
+
+                var newCount = parseInt(RuleCount) - parseInt(j);
+                j = parseInt(j) + 1;
+                var newRuleCount = parseInt(RuleCount) - parseInt(newCount);
+                //$(this).attr("id", "RuleNumber_" + newRuleCount);
+                $(this).find("div").find("h2").find("label").html("Rule Number " + newRuleCount);
+            });
+            $("#RuleCount").val(RuleCount);
+            //HideStickyPopup();
+        }
+
+        $(document).on("click", ".DeleteUpsell", function () {
+            var UpsellNumber = $(this).attr("data-upsell");
+
+            swal({
+                title: "Remove Upsell",
+                text: "Are you sure to remove Upsell?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: '#D24637',
+                confirmButtonText: 'Yes, I am sure!',
+                cancelButtonText: "No, cancel it!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+               function (isConfirm) {
+                   if (isConfirm) {
+
+                       $('#divUpsell_' + UpsellNumber).remove();
+                       var UpsellCount = $("#UpsellCount").val();
+                       UpsellCount = parseInt(UpsellCount) - 1;
+                       $("#UpsellCount").val(UpsellCount);
+                       var i = 1;
+                       var j = 1;
+                       $(".UpsellLabel").each(function () {
+
+                           var newCount = parseInt(UpsellCount) - parseInt(i);
+                           i = parseInt(i) + 1;
+                           var newUpsellCount = parseInt(UpsellCount) - parseInt(newCount);
+                           $(this).html("Upsell " + newUpsellCount)
+                       });
+                       $(".UpsellName").each(function () {
+
+                           var newCount = parseInt(UpsellCount) - parseInt(j);
+                           j = parseInt(j) + 1;
+                           var newUpsellCount = parseInt(UpsellCount) - parseInt(newCount);
+                           $(this).attr("data-Upsell", "UP" + newUpsellCount);
+                       });
+                   }
+               });
+
+        })
+
+        $(document).on("click", ".btnRemoveCond", function () {
+            var CondNumber = $(this).attr("data-CondNumber");
+            var RuleNumber = $(this).attr("data-RuleNumber");
+
+            swal({
+                title: "Remove Condition",
+                text: "Are you sure to remove Rule Condition?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: '#D24637',
+                confirmButtonText: 'Yes, I am sure!',
+                cancelButtonText: "No, cancel it!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+               function (isConfirm) {
+                   if (isConfirm) {
+                       $("#Cond_" + RuleNumber + "_" + CondNumber).remove();
+                       $("#btnAddCond_" + RuleNumber + "_1").attr("data-CondNumber", parseInt(CondNumber) - 1);
+                       window.location.hash = "";
+                       window.location.hash = "rules";
+                   }
+                   else {
+                       window.location.hash = "";
+                       window.location.hash = "rules";
+                   }
+               });
+        })
+
+        $("#SMTPConfigForm").validate({
+            rules: {
+
+                Title: {
+                    required: true
+                },
+                FromName: {
+                    required: true
+                },
+                FromEmail: {
+                    required: true,
+                    email: true
+                },
+                SmtpServer: {
+                    required: true
+                },
+                SmtpPort: {
+                    required: true
+                },
+                SmtpUser: {
+                    required: true
+                },
+                SmtpPassword: {
+                    required: true
+                },
+                SmtpDomain: {
+                    required: true
+                }
+                ,
+                AwsServiceURL: {
+                    required: true
+                },
+                AwsBulkEmailCount: {
+                    required: true,
+                    min:1
+                },
+                AwsSecretKey: {
+                    required: true
+                },
+                AwsAccessKeyId: {
+                    required: true
+                }
+            },
+            messages: {
+                FromEmail: {
+                    required: "(Please Enter Email)",
+                    email: "(Please Enter Valid Email)"
+                },
+                Title: {
+                    required: "(Please Enter Title)",
+                },
+                FromName: {
+                    required: "(Please Enter From Name)",
+                },
+                SmtpServer: {
+                    required: "(Please Enter SMTP Server/Hostname/IP Address)",
+                },
+                SmtpPort: {
+                    required: "(Please Enter Smtp Port)",
+                },
+                SmtpUser: {
+                    required: "(Please Enter Smtp User)",
+                },
+                SmtpPassword: {
+                    required: "(Please Enter Smtp Password)",
+                },
+                SmtpDomain: {
+                    required: "(Please Enter Smtp Domain)",
+                }
+                ,
+                AwsServiceURL: {
+                    required: "(Please Enter Aws Service URL)",
+                },
+                AwsBulkEmailCount: {
+                    required: "(Please Enter Aws Bulk Email Count)",
+                },
+                AwsSecretKey: {
+                    required: "(Please Enter Aws Secret Key)",
+                },
+                AwsAccessKeyId: {
+                    required: "(Please Enter Aws Access Key Id)",
+                }
+
+            },
+            submitHandler: function (form) {
+                form.submit();
+            },
+            errorPlacement: function (error, element) {
+                $(element)
+                        .closest("form")
+                        .find("label[for='" + element.attr("id") + "']")
+                        .append(error);
+            },
+            errorElement: "span",
+        });
+
+        $("#BasicInfoForm").validate({
+            rules: {
+
+                ProductName: {
+                    required: true
+                },
+                DataBaseName: {
+                    required: true
+                },
+                DBServer: {
+                    required: true
+                },
+                DBUserName: {
+                    required: true
+                },
+                //DBPassword: {
+                //    required: true
+                //},
+                DBServerType:{
+                    required: true
+                },
+                FrontEnd: {
+                    required: true
+                }
+            },
+            messages: {
+                ProductName: {
+                    required: "(Please Enter Product Name)",
+                },
+                DataBaseName: {
+                    required: "(Please Enter Data Base Name)",
+                },
+                DBServer: {
+                    required: "(Please Enter DB Server)",
+                },
+                DBUserName: {
+                    required: "(Please Enter DB User Name)",
+                },
+                //DBPassword: {
+                //    required: "(Please Enter DB Password)",
+                //},
+                DBServerType: {
+                    required: "(Please Select DB Server Type)",
+                },
+                FrontEnd: {
+                    required: "(Please Enter Smtp User)",
+                }
+            },
+            submitHandler: function (form) {
+                form.submit();
+            },
+            errorPlacement: function (error, element) {
+                $(element)
+                        .closest("form")
+                        .find("label[for='" + element.attr("id") + "']")
+                        .append(error);
+            },
+            errorElement: "span",
+        });
+    </script>
+
+    <script>
+
+        $(document).on("click", ".btnValidateRule", function () {
+            var RuleNumber = $(this).attr("data-RuleNumber");
+            ValidateRule(RuleNumber);
+        })
+
+        function UpdateRuleStatus(RuleNumber)
+        {
+            $("#btnStatus_" + RuleNumber).removeClass("btn-warning btnDeActivate");
+            $("#btnStatus_" + RuleNumber).addClass("btn-success disabled btnActivate");
+            $("#btnStatus_" + RuleNumber).html("Activate");
+            $("#IsActive_" + RuleNumber + "_1").val(false);
+        }
+
+        function ValidateRule(RuleNumber){  
+            var Subject = $("#Subject_" + RuleNumber + "_1").val();
+            var isValid = true;
+            if (Subject == null || Subject == "") {
+                $("span[id='spanSubject_" + RuleNumber + "_1']").html("* (Please Enter Subject)");
+            }
+            else {
+                $("span[id='spanSubject_" + RuleNumber + "_1']").html("*");
+            }
+            var Content = tinymceValidation(RuleNumber);
+
+            if (Content === "" || Content === null) {
+                $("#SpanEmailBody_" + RuleNumber + "_1").html("* (Please Enter Email Body)");
+            }
+            else {
+                $("#SpanEmailBody_" + RuleNumber + "_1").html("*");
+            }
+
+            $('.btnAddCond[data-RuleNumber=' + RuleNumber + ']').each(function (i, obj) {
+                var CondNumber = $(this).attr("data-CondNumber");
+
+                for (i = 1; i <= CondNumber; i++) {
+                    var Upsells = $("#ddlUpsells_" + RuleNumber + "_" + i).val();
+
+                    if (Upsells === "" || Upsells == null) {
+                        isValid = false;
+                        $("#spanddlUpsells_" + RuleNumber + "_" + i).html("* (Please Select Product)");
+                        $("#spanddlUpsells_" + RuleNumber + "_" + i).removeClass("hidden");
+                    }
+                    else {
+                        $("#spanddlUpsells_" + RuleNumber + "_" + i).html("*");
+                        $("#spanddlUpsells_" + RuleNumber + "_" + i).addClass("hidden");
+                    }
+                }
+            })
+
+            if (Content === "" || Content === null || Subject == null || Subject == "")
+            {
+                isValid = false;
+            }
+            if(isValid==false)
+            {
+                $("#IsValid_" + RuleNumber + "_1").val("false");
+                $("#btnStatus_" + RuleNumber).removeClass("btn-warning btnDeActivate");
+                $("#btnStatus_" + RuleNumber).addClass("btn-success disabled btnActivate");
+                $("#btnStatus_" + RuleNumber).html("Activate");
+                $("#IsActive_" + RuleNumber + "_1").val(false);
+            }
+            else{
+                $("#IsValid_" + RuleNumber + "_1").val("true");
+                $("#btnStatus_" + RuleNumber).removeClass("disabled");
+                $("#btnStatus_" + RuleNumber).html("Activate");
+            }
+        }
+
+        function tinymceValidation(RuleNumber) {
+
+            var content = "";
+            if (RuleNumber != "" && RuleNumber != null && parseInt(RuleNumber) > 0) {
+                content = tinyMCE.get('EmailBody_' + RuleNumber + "_1").getContent();
+            }
+            console.log("Content " + content);
+            return content;
+        }
+
+        /*
+        $(document).on("keypress", ".txtSubject", function () {
+
+            var RuleNumber = $(this).attr("data-RuleNumber");
+            ValidateRule(RuleNumber);
+        })
+        $(document).on("keyup", ".txtSubject", function () {
+
+            var RuleNumber = $(this).attr("data-RuleNumber");
+            ValidateRule(RuleNumber);
+        })
+
+
+        $(document).on("keypress", ".EmailTextArea", function () {
+
+            var RuleNumber = $(this).attr("data-RuleNumber");
+            ValidateRule(RuleNumber);
+        })
+        $(document).on("keyup", ".EmailTextArea", function () {
+
+            var RuleNumber = $(this).attr("data-RuleNumber");
+            ValidateRule(RuleNumber);
+        })
+        */
+        /*
+        function ValidateAllTabs() {
+            var IDs = $("#lstQuestionIDs").val();
+            var array = IDs.split(',');
+            tinymce.triggerSave();
+            var isValid = "1";
+            $.each(array, function (index, value) {
+                var Id = value;
+                var content = "";
+                console.log("Id " + Id);
+                if (Id != "" && Id != null && parseInt(Id) > 0) {
+                    content = tinyMCE.get('Answer' + Id).getContent();
+                }
+
+                var Rating = $("#Rating" + Id).val();
+                if (Rating == "") {
+                    $("#SpanRating" + Id).html("Please Enter Rating");
+                    isValid = "0";
+                }
+                else {
+                    $("#SpanRating" + Id).html("");
+                }
+                if (content === "" || content === null) {
+                    $("#SpanComment" + Id).html("Please Enter Comment");
+                    isValid = "0";
+                } else {
+                    $("#SpanComment" + Id).html("");
+                }
+            });
+            $("#IsValid").val(isValid);
+        }
+        */
+    </script>
+}

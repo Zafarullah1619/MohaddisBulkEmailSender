@@ -1,0 +1,47 @@
+﻿
+
+<div id="Cond_@(ViewBag.RuleNumber)_@(ViewBag.CondNumber)">
+    <div class="row">
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <select class="form-control ddlOperator" id="Opr_@(ViewBag.RuleNumber)_@(ViewBag.CondNumber)" data-CondNumber="@(ViewBag.CondNumber)" data-RuleNumber="@(ViewBag.RuleNumber)">
+                    <option value="∩">AND</option>
+                    <option value="∪">OR</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4"></div>
+    </div>
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label>Select Condition</label>
+                <select id="ddlUpsellType_@(ViewBag.RuleNumber)_@(ViewBag.CondNumber)" name="ddlUpsellType_@(ViewBag.RuleNumber)_@(ViewBag.CondNumber)" data-CondNumber="@(ViewBag.CondNumber)" data-RuleNumber="@(ViewBag.RuleNumber)" class="ddlUpsellType form-control ddlUpsellType_@(ViewBag.RuleNumber)">
+                    <option value="Bought">If Bought</option>
+                    <option value="NotBought">If Not Bought</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="form-group">
+                <label>Select Products <span class="required-mark" id="spanddlUpsells_@(ViewBag.RuleNumber)_@(ViewBag.CondNumber)">*</span></label>
+                <select id="ddlUpsells_@(ViewBag.RuleNumber)_@(ViewBag.CondNumber)" name="ddlUpsells_@(ViewBag.RuleNumber)_@(ViewBag.CondNumber)[]" data-CondNumber="@(ViewBag.CondNumber)" data-RuleNumber="@(ViewBag.RuleNumber)" multiple="multiple" style="width: 100%" class="ddlUpsells form-control js-source-states ddlUpsells_@(ViewBag.RuleNumber)">
+                    @if (ViewBag.ProductUpsells != null && ViewBag.ProductUpsells.Count > 0)
+                    {
+                        foreach (var item in ViewBag.ProductUpsells)
+                        {
+                            <option value="@item.Upsell">@item.UpsellName</option>
+                        }
+                    }
+                </select>
+
+
+            </div>
+        </div>
+        <div class="col-lg-1">
+            <a class="btn btn-xs btn-danger m-t-lg btnRemoveCond" href="#" data-CondNumber="@(ViewBag.CondNumber)" data-RuleNumber="@(ViewBag.RuleNumber)" id="btnRemoveCond_@(ViewBag.RuleNumber)_@(ViewBag.CondNumber)" title="Remove Condition"><i class="fa fa-remove"></i></a>
+        </div>
+    </div>
+</div>
