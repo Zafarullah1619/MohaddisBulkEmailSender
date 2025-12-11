@@ -158,6 +158,7 @@ namespace ASE.Controllers
             var AwsSecretKey = model.EmailSmtpConfiguration.AwsSecretKey;
 
             var fromEmail = model.EmailSmtpConfiguration.FromEmail;
+            var FromName = model.EmailSmtpConfiguration.FromName;
 
             // Set SMTP configuration
             var smtpUser = model.EmailSmtpConfiguration.SmtpUser;
@@ -179,12 +180,12 @@ namespace ASE.Controllers
                             if (isAWSBulkEmail == true)
                             {
                                 // Send email using AWS configuration
-                                EmailServiceBAL.SendEmailUsingAWS(AwsAccessKeyId, AwsSecretKey, fromEmail, subscriber.Email, subject, body);
+                                EmailServiceBAL.SendEmailUsingAWS(AwsAccessKeyId, AwsSecretKey, fromEmail, FromName, subscriber.Email, subject, body, productId, subscriber.Id);
                             }
                             else
                             {
                                 // Send email using SMTP configuration
-                                EmailServiceBAL.SendEmailUsingSMTP(smtpServer, smtpPort, enableSSL, smtpUser, smtpPassword, fromEmail, subscriber.Email, subject, body);
+                                EmailServiceBAL.SendEmailUsingSMTP(smtpServer, smtpPort, enableSSL, smtpUser, smtpPassword, fromEmail, subscriber.Email, subject, body, productId, subscriber.Id);
                             }
 
                         }
@@ -210,6 +211,54 @@ namespace ASE.Controllers
         {
             var removed = ProductsBAL.RemoveProduct(ProductId);
             return Json(removed, JsonRequestBehavior.AllowGet);
+        }
+
+        [AllowAnonymous]
+        public ActionResult Unsubscribe(string email, long? productId = null, long? subscriberId = null, string token = null)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email))
+                {
+                    ViewBag.Message = "Invalid unsubscribe link. Email address is missing.";
+                    ViewBag.MessageEnglish = "Invalid unsubscribe link. Email address is missing.";
+                    ViewBag.Success = false;
+                    return View("~/Views/Unsubscribe/Index.cshtml");
+                }
+
+                // Verify token if provided
+                if (!string.IsNullOrEmpty(token))
+                {
+                    // Token verification logic can be added here if needed
+                    // For now, we'll proceed with the unsubscribe
+                }
+
+                // Unsubscribe the subscriber
+                var result = SubscriberProductsBAL.UnsubscribeSubscriber(email, productId, subscriberId);
+
+                if (result != null)
+                {
+                    ViewBag.Message = "آپ کو کامیابی کے ساتھ سبسکرائب کر دیا گیا ہے۔ آپ کو اب مزید ای میلز موصول نہیں ہوں گی۔";
+                    ViewBag.MessageEnglish = "You have been successfully unsubscribed. You will no longer receive emails.";
+                    ViewBag.Success = true;
+                }
+                else
+                {
+                    ViewBag.Message = "سبسکرائب کرنے میں مسئلہ پیش آیا۔ براہ کرم دوبارہ کوشش کریں یا رابطہ کریں۔";
+                    ViewBag.MessageEnglish = "There was a problem unsubscribing. Please try again or contact support.";
+                    ViewBag.Success = false;
+                }
+
+                return View("~/Views/Unsubscribe/Index.cshtml");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogRelativeMessage($"Error in Unsubscribe action: {ex.Message}", true);
+                ViewBag.Message = "سبسکرائب کرنے میں خرابی پیش آئی۔ براہ کرم بعد میں دوبارہ کوشش کریں۔";
+                ViewBag.MessageEnglish = "An error occurred while unsubscribing. Please try again later.";
+                ViewBag.Success = false;
+                return View("~/Views/Unsubscribe/Index.cshtml");
+            }
         }
 
         [AllowAnonymous]
@@ -258,12 +307,12 @@ namespace ASE.Controllers
                                 if (ProductSMTP.AwsAccessKeyId != "")
                                 {
                                     // Send email using AWS configuration
-                                    EmailServiceBAL.SendEmailUsingAWS(ProductSMTP.AwsAccessKeyId, ProductSMTP.AwsSecretKey, ProductSMTP.FromEmail, subscriber.Email, personalizedSubject, emailBody);
+                                    EmailServiceBAL.SendEmailUsingAWS(ProductSMTP.AwsAccessKeyId, ProductSMTP.AwsSecretKey, ProductSMTP.FromEmail, ProductSMTP.FromName, subscriber.Email, personalizedSubject, emailBody, product.Id, subscriber.Id);
                                 }
                                 else
                                 {
                                     // Send email using SMTP configuration
-                                    EmailServiceBAL.SendEmailUsingSMTP(ProductSMTP.SmtpServer, (long)ProductSMTP.SmtpPort, ProductSMTP.EnableSSL, ProductSMTP.SmtpUser, ProductSMTP.SmtpPassword, ProductSMTP.FromEmail, subscriber.Email, personalizedSubject, emailBody);
+                                    EmailServiceBAL.SendEmailUsingSMTP(ProductSMTP.SmtpServer, (long)ProductSMTP.SmtpPort, ProductSMTP.EnableSSL, ProductSMTP.SmtpUser, ProductSMTP.SmtpPassword, ProductSMTP.FromEmail, subscriber.Email, personalizedSubject, emailBody, product.Id, subscriber.Id);
                                 }
                             }
 

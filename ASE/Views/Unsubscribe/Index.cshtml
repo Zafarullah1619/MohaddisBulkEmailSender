@@ -1,6 +1,5 @@
-﻿
-@{
-    ViewBag.Title = "Unsubscribed";
+﻿@{
+    ViewBag.Title = "Unsubscribe";
     Layout = "~/Views/Shared/_Layout_Unsubs.cshtml";
 }
 
@@ -11,9 +10,28 @@
             </div>
             <div class="hpanel">
                 <div class="panel-body">
-                    <h4>
-                        You have been successfully unsubscribed.
-                    </h4>
+                    @if (ViewBag.Success != null && ViewBag.Success)
+                    {
+                        <div class="alert alert-success" style="direction: rtl; text-align: right; font-family: Arial, sans-serif;">
+                            <h4 style="margin-top: 0; direction: rtl; text-align: right;">کامیاب</h4>
+                            <p style="direction: rtl; text-align: right; font-size: 16px;">@ViewBag.Message</p>
+                        </div>
+                        <div class="alert alert-success" style="margin-top: 20px;">
+                            <h4 style="margin-top: 0;">Success</h4>
+                            <p>@ViewBag.MessageEnglish</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger" style="direction: rtl; text-align: right; font-family: Arial, sans-serif;">
+                            <h4 style="margin-top: 0; direction: rtl; text-align: right;">خرابی</h4>
+                            <p style="direction: rtl; text-align: right; font-size: 16px;">@ViewBag.Message</p>
+                        </div>
+                        <div class="alert alert-danger" style="margin-top: 20px;">
+                            <h4 style="margin-top: 0;">Error</h4>
+                            <p>@ViewBag.MessageEnglish</p>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

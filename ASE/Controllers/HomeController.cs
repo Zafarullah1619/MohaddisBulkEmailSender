@@ -1,9 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using ASE.Utility;
+using Newtonsoft.Json;
 using Org.Business.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +28,11 @@ namespace ASE.Controllers
             {
 
             }
+
+
+            //var AwsSecretKey = StringHelper.Encrypt("9+4gErZZapBLxJYuf5hfcR1/ulApCCiLBpkmMSnX", true);
+            //var AwsAccessKeyId = StringHelper.Encrypt("AKIARHQBNLSCPEL2OKKF", true);
+            
 
             return RedirectToAction("Index", "SubscriberProduct");
         }

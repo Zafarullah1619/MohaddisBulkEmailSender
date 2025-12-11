@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text;
 
 namespace Org.DataAccess
 {
@@ -377,17 +378,15 @@ namespace Org.DataAccess
         {
             try
             {
-                using (IDbConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
 
-                    using (IDbCommand command = connection.CreateCommand())
+                    using (SqlCommand command = new SqlCommand(sqlQuery, connection))
                     {
-                        command.CommandText = sqlQuery;
-
                         List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
 
-                        using (IDataReader reader = command.ExecuteReader())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
@@ -395,7 +394,30 @@ namespace Org.DataAccess
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
+                                    object columnValue;
+                                    
+                                    // Check if the value is null
+                                    if (reader.IsDBNull(i))
+                                    {
+                                        columnValue = DBNull.Value;
+                                    }
+                                    else
+                                    {
+                                        // Get the field type
+                                        Type fieldType = reader.GetFieldType(i);
+                                        
+                                        // For string types, use GetString() to ensure proper Unicode handling
+                                        // This works correctly for both NVARCHAR (Unicode) and VARCHAR columns
+                                        if (fieldType == typeof(string))
+                                        {
+                                            columnValue = reader.GetString(i);
+                                        }
+                                        else
+                                        {
+                                            columnValue = reader.GetValue(i);
+                                        }
+                                    }
+                                    
                                     row[columnName] = columnValue;
                                 }
                                 results.Add(row);
@@ -417,17 +439,38 @@ namespace Org.DataAccess
         {
             try
             {
-                using (IDbConnection connection = new MySqlConnection(connectionString))
+                // Ensure connection string has utf8mb4 charset if not already present
+                MySqlConnectionStringBuilder csb = new MySqlConnectionStringBuilder(connectionString);
+                // Add charset to connection string if not already present
+                if (!connectionString.ToLower().Contains("charset"))
+                {
+                    csb["CharSet"] = "utf8mb4";
+                }
+                connectionString = csb.ConnectionString;
+
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
-
-                    using (IDbCommand command = connection.CreateCommand())
+                    
+                    // Explicitly set the connection charset to utf8mb4 for Unicode support
+                    using (MySqlCommand setCharsetCmd = new MySqlCommand("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci", connection))
                     {
-                        command.CommandText = sqlQuery;
+                        setCharsetCmd.ExecuteNonQuery();
+                    }
+                    
+                    // Also set character set for the connection and session
+                    using (MySqlCommand setSessionCmd = new MySqlCommand("SET CHARACTER SET utf8mb4", connection))
+                    {
+                        setSessionCmd.ExecuteNonQuery();
+                    }
 
+                    using (MySqlCommand command = new MySqlCommand(sqlQuery, connection))
+                    {
+                        command.CommandTimeout = 300; // Set timeout if needed
+                        
                         List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
 
-                        using (IDataReader reader = command.ExecuteReader())
+                        using (MySqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
@@ -435,7 +478,44 @@ namespace Org.DataAccess
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
+                                    object columnValue;
+                                    
+                                    // Check if the value is null
+                                    if (reader.IsDBNull(i))
+                                    {
+                                        columnValue = DBNull.Value;
+                                    }
+                                    else
+                                    {
+                                        // Get the field type
+                                        Type fieldType = reader.GetFieldType(i);
+                                        
+                                        // For string types, use GetString() to ensure proper Unicode handling
+                                        if (fieldType == typeof(string))
+                                        {
+                                            try
+                                            {
+                                                // Use GetString() which should preserve Unicode
+                                                columnValue = reader.GetString(i);
+                                            }
+                                            catch
+                                            {
+                                                // Fallback to GetValue if GetString fails
+                                                columnValue = reader.GetValue(i);
+                                            }
+                                        }
+                                        else if (fieldType == typeof(byte[]))
+                                        {
+                                            // If it's a byte array, decode as UTF-8
+                                            byte[] bytes = (byte[])reader.GetValue(i);
+                                            columnValue = Encoding.UTF8.GetString(bytes);
+                                        }
+                                        else
+                                        {
+                                            columnValue = reader.GetValue(i);
+                                        }
+                                    }
+                                    
                                     row[columnName] = columnValue;
                                 }
                                 results.Add(row);

@@ -379,6 +379,49 @@ namespace Org.Business.Methods
             }
         }
 
+        public static BaseEntity UnsubscribeSubscriber(string email, long? productId = null, long? subscriberId = null)
+        {
+            try
+            {
+                using (IUnitOfWork uow = new UnitOfWork())
+                {
+                    ProductSubscribers PU = new ProductSubscribers();
+                    Filters Filter = new Filters();
+
+                    // Set IsActive to false for unsubscription
+                    PU.IsActive = false;
+
+                    if (subscriberId.HasValue)
+                    {
+                        Filter.AddSqlParameters(() => PU.Id, subscriberId.Value);
+                        Filter.AddSqlParameters(() => PU.IsActive, false);
+                        Filter.AddSqlParameters(() => PU.Command, "UNSUBSCRIBE");
+                    }
+                    else if (productId.HasValue)
+                    {
+                        Filter.AddSqlParameters(() => PU.ProductId, productId.Value);
+                        Filter.AddSqlParameters(() => PU.Email, email);
+                        Filter.AddSqlParameters(() => PU.IsActive, false);
+                        Filter.AddSqlParameters(() => PU.Command, "UNSUBSCRIBE");
+                    }
+                    else
+                    {
+                        Filter.AddSqlParameters(() => PU.Email, email);
+                        Filter.AddSqlParameters(() => PU.IsActive, false);
+                        Filter.AddSqlParameters(() => PU.Command, "UNSUBSCRIBE");
+                    }
+
+                    IRepository<BaseEntity> oRepository = new Repository<BaseEntity>(uow.DataContext);
+                    return oRepository.LoadSP("sp_GetSubscribers", Filter).FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogRelativeMessage($"Error unsubscribing subscriber: {ex.Message}", true);
+                throw ex;
+            }
+        }
+
         public static EmailSettings SubscriberProductEmailSettings(long? ProductId)
         {
             try
@@ -410,7 +453,29 @@ namespace Org.Business.Methods
 
                 foreach (var columnName in contentRow.Keys)
                 {
-                    var fieldValue = contentRow[columnName].ToString();
+                    object fieldValueObj = contentRow[columnName];
+                    string fieldValue;
+
+                    // Preserve Unicode when converting to string
+                    if (fieldValueObj == null || fieldValueObj == DBNull.Value)
+                    {
+                        fieldValue = string.Empty;
+                    }
+                    else if (fieldValueObj is string)
+                    {
+                        // Already a string, preserve it directly
+                        fieldValue = (string)fieldValueObj;
+                    }
+                    else if (fieldValueObj is byte[])
+                    {
+                        // If it's a byte array, decode as UTF-8
+                        fieldValue = Encoding.UTF8.GetString((byte[])fieldValueObj);
+                    }
+                    else
+                    {
+                        // For other types, convert to string (preserves Unicode if already correct)
+                        fieldValue = Convert.ToString(fieldValueObj);
+                    }
 
                     // Decode HTML entities
                     fieldValue = HttpUtility.HtmlDecode(fieldValue);
@@ -439,6 +504,10 @@ namespace Org.Business.Methods
                 builder.InitialCatalog = product.DataBaseName;
                 builder.UserID = product.DBUserName;
                 builder.Password = product.DBPassword;
+                // Enable Unicode support for SQL Server
+                builder.IntegratedSecurity = false;
+                // SQL Server uses NVARCHAR for Unicode, connection string handles it by default
+                // But we ensure proper encoding by not forcing any character set restrictions
 
                 return builder.ConnectionString;
             }
@@ -450,6 +519,9 @@ namespace Org.Business.Methods
                 builder.Database = product.DataBaseName;
                 builder.UserID = product.DBUserName;
                 builder.Password = product.DBPassword;
+                // Add UTF-8 support for MySQL to handle Unicode characters like Urdu
+                // Use indexer to set charset as it's not a direct property
+                builder["CharSet"] = "utf8mb4";
 
                 return builder.ConnectionString;
             }

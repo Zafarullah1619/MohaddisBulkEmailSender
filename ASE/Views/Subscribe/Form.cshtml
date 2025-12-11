@@ -1,0 +1,460 @@
+@{
+    Layout = null;
+    ViewBag.Title = "Subscribe";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscribe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: auto;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: transparent;
+            padding: 15px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: auto;
+        }
+
+        .subscribe-form {
+            max-width: 100%;
+            width: 100%;
+            margin: 0;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            overflow: visible;
+        }
+
+        @@media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .subscribe-form {
+                padding: 15px;
+            }
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .submit-btn {
+                width: 100%;
+            }
+            input[type="email"],
+            input[type="text"] {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+
+        @@media (max-width: 400px) {
+            body {
+                padding: 8px;
+            }
+            .subscribe-form {
+                padding: 12px;
+            }
+            .form-title {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+            input[type="email"],
+            input[type="text"],
+            .submit-btn {
+                padding: 8px 12px;
+                font-size: 14px;
+                height: 38px;
+            }
+        }
+
+        .form-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-group {
+            flex: 1;
+            margin: 0;
+            min-width: 0;
+        }
+
+        label {
+            display: none;
+        }
+
+        input[type="email"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+            height: 42px;
+        }
+
+        input[type="email"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+        }
+
+        input[type="email"].error,
+        input[type="text"].error {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1) !important;
+        }
+
+        .submit-btn {
+            padding: 10px 25px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            height: 42px;
+            box-sizing: border-box;
+        }
+
+        .submit-btn:hover {
+            background: #45a049;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .submit-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        #message-container {
+            min-height: 0;
+            margin-bottom: 0;
+            padding: 0;
+            transition: margin-bottom 0.2s ease, min-height 0.2s ease;
+            overflow: hidden;
+        }
+
+        #message-container:not(:empty) {
+            margin-bottom: 12px;
+            min-height: auto;
+        }
+
+        .message {
+            padding: 10px 12px;
+            border-radius: 4px;
+            margin: 0;
+            font-size: 13px;
+            text-align: center;
+            line-height: 1.4;
+            display: block;
+            animation: slideDown 0.2s ease;
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .error-message {
+            color: #721c24;
+            font-size: 14px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4CAF50;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="subscribe-form">
+        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+        {
+            <div class="error-message">@ViewBag.ErrorMessage</div>
+        }
+        else
+        {
+            @*<div class="form-title">Subscribe to Newsletter</div>*@
+            <div id="message-container" style="min-height: 0; transition: min-height 0.3s ease;"></div>
+            <form id="subscribeForm" method="post" action="@Url.Action("Form", "Subscribe", new { id = ViewBag.ProductId })" novalidate>
+                <input type="hidden" name="id" value="@ViewBag.ProductId" />
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="text" id="email" name="email" placeholder="Enter your email" autocomplete="email" />
+                    </div>
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        Subscribe
+                    </button>
+                </div>
+                <div class="loading" id="loading" style="text-align: center; margin-top: 10px;">
+                    <span class="spinner"></span>Subscribing...
+                </div>
+            </form>
+        }
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#subscribeForm').on('submit', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var email = $('#email').val().trim();
+                var productId = $('input[name="id"]').val();
+
+                // Clear previous messages immediately (don't fade to prevent layout shift)
+                $('#message-container').empty();
+                
+                // Validate email is not empty
+                if (!email) {
+                    $('#email').addClass('error').focus();
+                    showMessage('Please enter your email address', 'error');
+                    return;
+                }
+
+                // Validate email format
+                if (!validateEmail(email)) {
+                    $('#email').addClass('error').focus();
+                    showMessage('Please enter a valid email address (e.g., yourname@example.com)', 'error');
+                    return;
+                }
+
+                // Clear any previous error styling
+                $('#email').removeClass('error');
+
+                // Show loading
+                $('#submitBtn').prop('disabled', true);
+                $('#loading').show();
+
+                // Submit via AJAX
+                $.ajax({
+                    url: '@Url.Action("Form", "Subscribe", new { id = ViewBag.ProductId })',
+                    type: 'POST',
+                    data: {
+                        id: productId,
+                        email: email
+                    },
+                    success: function (response) {
+                        $('#loading').hide();
+                        $('#submitBtn').prop('disabled', false);
+
+                        if (response.success) {
+                            showMessage(response.message || 'Successfully subscribed! Thank you.', 'success');
+                            $('#email').removeClass('error');
+                            $('#subscribeForm')[0].reset();
+                        } else {
+                            $('#email').addClass('error');
+                            showMessage(response.message || 'Failed to subscribe. Please try again.', 'error');
+                        }
+                        setTimeout(resizeIframe, 100);
+                    },
+                    error: function (xhr, status, error) {
+                        $('#loading').hide();
+                        $('#submitBtn').prop('disabled', false);
+                        $('#email').addClass('error');
+                        
+                        var errorMsg = 'An error occurred. Please try again later.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+                        showMessage(errorMsg, 'error');
+                        setTimeout(resizeIframe, 100);
+                    }
+                });
+            });
+
+            // Email validation function
+            function validateEmail(email) {
+                // RFC 5322 compliant email regex (simplified but comprehensive)
+                var emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+                return emailRegex.test(email);
+            }
+
+            // Validate email on blur (when user leaves the field)
+            $('#email').on('blur', function() {
+                var email = $(this).val().trim();
+                if (email && !validateEmail(email)) {
+                    $(this).addClass('error');
+                    showMessage('Please enter a valid email address', 'error');
+                } else {
+                    $(this).removeClass('error');
+                }
+            });
+
+            // Remove error styling when user starts typing
+            $('#email').on('input', function() {
+                $(this).removeClass('error').css('border-color', '');
+                // Clear error message if user is typing
+                var messageContainer = $('#message-container');
+                var errorMsg = messageContainer.find('.message-error');
+                if (errorMsg.length > 0 && errorMsg.text().includes('valid email')) {
+                    messageContainer.empty();
+                }
+            });
+
+            function showMessage(message, type) {
+                var messageContainer = $('#message-container');
+                var messageHtml = '<div class="message message-' + type + '">' + message + '</div>';
+                messageContainer.html(messageHtml);
+                
+                // Trigger resize after message appears
+                setTimeout(function() {
+                    resizeIframe();
+                }, 100);
+
+                // Auto-hide success message after 5 seconds
+                if (type === 'success') {
+                    setTimeout(function () {
+                        messageContainer.fadeOut(300, function () {
+                            $(this).empty().show();
+                            setTimeout(resizeIframe, 100);
+                        });
+                    }, 5000);
+                }
+            }
+
+            // Auto-resize iframe height for parent window
+            function resizeIframe() {
+                if (window.parent !== window) {
+                    // Get the actual content height
+                    var body = document.body;
+                    var html = document.documentElement;
+                    
+                    var height = Math.max(
+                        body.scrollHeight,
+                        body.offsetHeight,
+                        html.clientHeight,
+                        html.scrollHeight,
+                        html.offsetHeight
+                    );
+                    
+                    // Add small buffer to prevent scrollbars
+                    height = height + 5;
+                    
+                    window.parent.postMessage({
+                        type: 'resize-iframe',
+                        height: height,
+                        source: 'subscribe-form'
+                    }, '*');
+                }
+            }
+
+            // Initial resize
+            setTimeout(resizeIframe, 100);
+            $(window).on('load', resizeIframe);
+            
+            // Resize after form interactions
+            $('#subscribeForm').on('submit', function() {
+                setTimeout(resizeIframe, 300);
+                setTimeout(resizeIframe, 800);
+            });
+            
+            // Resize when messages are shown/hidden
+            var messageObserver = new MutationObserver(function(mutations) {
+                setTimeout(resizeIframe, 100);
+            });
+            
+            var messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                messageObserver.observe(messageContainer, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+            
+            // Resize on window resize
+            $(window).on('resize', function() {
+                setTimeout(resizeIframe, 100);
+            });
+        });
+    </script>
+</body>
+</html>

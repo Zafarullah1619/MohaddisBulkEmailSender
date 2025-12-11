@@ -1,14 +1,15 @@
-﻿using System;
+﻿using ASE.Utility;
 using Org.Business.Methods;
 using Org.Business.Objects;
+using Org.Utils;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
-using System.Configuration;
-using System.Net.Mail;
-using System.Net;
-using Org.Utils;
 
 namespace ASE.Controllers
 {
@@ -67,9 +68,10 @@ namespace ASE.Controllers
                 // < add key = "AwsSecretKey" value = "9+4gErZZapBLxJYuf5hfcR1/ulApCCiLBpkmMSnX" />
                 // < add key = "AwsAccessKeyId" value = "AKIARHQBNLSCPEL2OKKF" />
 
-                var AwsSecretKey = ConfigurationManager.AppSettings["AwsSecretKey"];
-                var AwsAccessKeyId = ConfigurationManager.AppSettings["AwsAccessKeyId"];
+                var AwsSecretKey = StringHelper.Decrypt(ConfigurationManager.AppSettings["AwsSecretKey"], true);
+                var AwsAccessKeyId = StringHelper.Decrypt(ConfigurationManager.AppSettings["AwsAccessKeyId"], true);
                 var AwsFromEmail = ConfigurationManager.AppSettings["AwsFromEmail"];
+                var AwsFromName = ConfigurationManager.AppSettings["AwsFromName"];
                 string Subject = ConfigurationManager.AppSettings["Subject"];
 
                 var SMTPFromEmail = ConfigurationManager.AppSettings["SMTPFromEmail"];
@@ -86,9 +88,9 @@ namespace ASE.Controllers
 
                     try
                     {
-                        EmailServiceBAL.SendEmailUsingAWS(AwsAccessKeyId, AwsSecretKey, AwsFromEmail, data.ToEmail, Subject, finalMergedBody);
+                        EmailServiceBAL.SendEmailUsingAWS(AwsAccessKeyId, AwsSecretKey, AwsFromEmail, AwsFromName, data.ToEmail, Subject, finalMergedBody);
 
-                       // EmailServiceBAL.SendEmailUsingSMTP(SmtpServer, SmtpPort, true, SmtpUsername, SmtpPassword, SMTPFromEmail, data.ToEmail, Subject, finalMergedBody);
+                        // EmailServiceBAL.SendEmailUsingSMTP(SmtpServer, SmtpPort, true, SmtpUsername, SmtpPassword, SMTPFromEmail, data.ToEmail, Subject, finalMergedBody);
                     }
                     catch (Exception ex)
                     {
